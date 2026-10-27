@@ -1,5 +1,6 @@
 import SwiftData
 import SwiftUI
+import VokabelKit
 
 struct HomeView: View {
     @Environment(PlayerProgress.self) private var progress
@@ -11,6 +12,7 @@ struct HomeView: View {
     @State private var showNewLesson = false
     @State private var newLessonName = ""
     @State private var showWardrobe = false
+    @State private var showHerd = false
 
     private var dueCount: Int {
         words.reduce(0) { count, word in
@@ -24,6 +26,7 @@ struct HomeView: View {
                 VStack(spacing: 20) {
                     LingoCard { showWardrobe = true }
                     ProgressHeader()
+                    HerdRow { showHerd = true }
 
                     if words.isEmpty {
                         EmptyHint()
@@ -61,6 +64,7 @@ struct HomeView: View {
                 QuizView(words: request.words, mode: request.mode)
             }
             .sheet(isPresented: $showWardrobe) { WardrobeView() }
+            .sheet(isPresented: $showHerd) { HerdView() }
         }
     }
 
@@ -97,6 +101,33 @@ private struct LingoCard: View {
         }
         .padding()
         .background(Color("WoolCard"), in: RoundedRectangle(cornerRadius: 20))
+    }
+}
+
+private struct HerdRow: View {
+    @Environment(PlayerProgress.self) private var progress
+    let open: () -> Void
+
+    var body: some View {
+        let herd = Herd.unlocked(atLevel: progress.level)
+        Button(action: open) {
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Lingos Herde").font(.headline)
+                    if herd.isEmpty {
+                        Text("Ab Level 2 kommt das erste Tier dazu").font(.subheadline).foregroundStyle(.secondary)
+                    } else {
+                        Text(herd.suffix(6).map(\.emoji).joined(separator: " ")).font(.title2)
+                    }
+                }
+                Spacer()
+                Text("\(herd.count)/\(Herd.animals.count)").font(.subheadline.bold()).foregroundStyle(.secondary)
+                Image(systemName: "chevron.right").foregroundStyle(.tertiary)
+            }
+            .padding()
+            .background(Color("WoolCard"), in: RoundedRectangle(cornerRadius: 20))
+        }
+        .buttonStyle(.plain)
     }
 }
 

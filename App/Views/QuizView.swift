@@ -12,6 +12,7 @@ struct QuizView: View {
     @State private var results: [AnswerResult] = []
     @State private var earnedStars = 0
     @State private var levelUp = false
+    @State private var newAnimals: [Animal] = []
     @FocusState private var focused: Bool
 
     enum Phase: Equatable {
@@ -31,7 +32,7 @@ struct QuizView: View {
         NavigationStack {
             Group {
                 if phase == .finished || card == nil {
-                    SummaryView(results: results, stars: earnedStars, levelUp: levelUp) { dismiss() }
+                    SummaryView(results: results, stars: earnedStars, levelUp: levelUp, newAnimals: newAnimals) { dismiss() }
                 } else if let card {
                     question(card)
                 }
@@ -169,7 +170,11 @@ struct QuizView: View {
         card.word.record(result, direction: card.direction)
         results.append(result)
         earnedStars += Rewards.stars(for: result)
-        if progress.award(result) { levelUp = true }
+        let levelBefore = progress.level
+        if progress.award(result) {
+            levelUp = true
+            newAnimals += Herd.newlyUnlocked(from: levelBefore, to: progress.level)
+        }
         phase = .feedback(result, message)
         Speaker.shared.speak(card.word.english)
     }
@@ -214,7 +219,10 @@ private struct SummaryView: View {
     let results: [AnswerResult]
     let stars: Int
     let levelUp: Bool
+    let newAnimals: [Animal]
     let done: () -> Void
+
+    @State private var shownAnimal: Animal?
 
     private var correct: Int { results.filter { $0 != .wrong }.count }
 
@@ -225,6 +233,22 @@ private struct SummaryView: View {
             if levelUp {
                 Text("Level \(progress.level) erreicht!").font(.largeTitle.bold()).foregroundStyle(.tint)
                 Text("Du bist jetzt: \(progress.levelTitle) 🦙").font(.title3)
+            }
+            ForEach(newAnimals) { animal in
+                Button { shownAnimal = animal } label: {
+                    HStack(spacing: 12) {
+                        Text(animal.emoji).font(.system(size: 44))
+                        VStack(alignment: .leading) {
+                            Text("Neu in deiner Herde!").font(.caption.bold()).foregroundStyle(.tint)
+                            Text(animal.name).font(.title3.bold())
+                        }
+                        Spacer()
+                        Image(systemName: "chevron.right").foregroundStyle(.tertiary)
+                    }
+                    .padding()
+                    .background(Color("WoolCard"), in: RoundedRectangle(cornerRadius: 16))
+                }
+                .buttonStyle(.plain)
             }
             Text("\(correct) von \(results.count) gewusst").font(.title.bold())
             Label("+\(stars) Sterne", systemImage: "star.fill").font(.title2).foregroundStyle(.yellow)
@@ -237,5 +261,6 @@ private struct SummaryView: View {
             .buttonStyle(.borderedProminent)
             .buttonBorderShape(.roundedRectangle(radius: 16))
         }
+        .sheet(item: $shownAnimal) { AnimalCard(animal: $0) }
     }
 }

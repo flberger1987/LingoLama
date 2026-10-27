@@ -90,3 +90,18 @@ struct WardrobeTests {
         #expect(Wardrobe.purchaseProblem(for: cap, owned: ["cap"], availableStars: 100) == .alreadyOwned)
     }
 }
+
+struct HerdTests {
+    @Test func oneAnimalPerLevelFromTwo() {
+        #expect(Herd.animals.map(\.unlockLevel) == Array(2...(Herd.animals.count + 1)))
+        #expect(Set(Herd.animals.map(\.id)).count == Herd.animals.count)
+    }
+
+    @Test func unlocking() {
+        #expect(Herd.unlocked(atLevel: 1).isEmpty)
+        #expect(Herd.unlocked(atLevel: 4).map(\.id) == ["frog", "macaw", "bear"])
+        #expect(Herd.newlyUnlocked(from: 3, to: 4).map(\.id) == ["bear"])
+        #expect(Herd.newlyUnlocked(from: 2, to: 4).count == 2)
+        #expect(Herd.newlyUnlocked(from: 4, to: 4).isEmpty)
+    }
+}
