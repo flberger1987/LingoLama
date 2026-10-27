@@ -10,6 +10,7 @@ struct HomeView: View {
     @State private var quiz: QuizRequest?
     @State private var showNewLesson = false
     @State private var newLessonName = ""
+    @State private var showWardrobe = false
 
     private var dueCount: Int {
         words.reduce(0) { count, word in
@@ -21,6 +22,7 @@ struct HomeView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 20) {
+                    LingoCard { showWardrobe = true }
                     ProgressHeader()
 
                     if words.isEmpty {
@@ -48,6 +50,7 @@ struct HomeView: View {
             }
             .background(Color("Wool"))
             .navigationTitle("LingoLama")
+            .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(for: Lesson.self) { LessonView(lesson: $0) }
             .alert("Neue Lektion", isPresented: $showNewLesson) {
                 TextField("z. B. Unit 3", text: $newLessonName)
@@ -57,6 +60,7 @@ struct HomeView: View {
             .fullScreenCover(item: $quiz) { request in
                 QuizView(words: request.words, mode: request.mode)
             }
+            .sheet(isPresented: $showWardrobe) { WardrobeView() }
         }
     }
 
@@ -74,6 +78,28 @@ struct QuizRequest: Identifiable {
     let mode: QuizMode
 }
 
+private struct LingoCard: View {
+    @Environment(PlayerProgress.self) private var progress
+    let openWardrobe: () -> Void
+
+    var body: some View {
+        HStack(spacing: 16) {
+            Button(action: openWardrobe) { LingoView(size: 84) }
+                .buttonStyle(.plain)
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Hallo Valerie!").font(.title2.bold())
+                Text(progress.levelTitle).foregroundStyle(.secondary)
+                Button("Kleiderschrank", systemImage: "tshirt.fill", action: openWardrobe)
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.small)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding()
+        .background(Color("WoolCard"), in: RoundedRectangle(cornerRadius: 20))
+    }
+}
+
 private struct ProgressHeader: View {
     @Environment(PlayerProgress.self) private var progress
 
@@ -81,12 +107,12 @@ private struct ProgressHeader: View {
         VStack(spacing: 14) {
             HStack(spacing: 12) {
                 Stat(value: "\(progress.level)", label: "Level", symbol: "crown.fill", color: .accentColor)
-                Stat(value: "\(progress.stars)", label: "Sterne", symbol: "star.fill", color: .yellow)
+                Stat(value: "\(progress.availableStars)", label: "Sterne", symbol: "star.fill", color: .yellow)
                 Stat(value: "\(progress.streak)", label: progress.streak == 1 ? "Tag" : "Tage", symbol: "flame.fill",
                      color: progress.practicedToday ? .orange : .gray)
             }
             ProgressView(value: progress.levelProgress) {
-                Text("🦙 \(progress.levelTitle) · bis Level \(progress.level + 1)").font(.caption).foregroundStyle(.secondary)
+                Text("Bis Level \(progress.level + 1)").font(.caption).foregroundStyle(.secondary)
             }
         }
         .padding()
@@ -175,9 +201,8 @@ struct MasteryRing: View {
 private struct EmptyHint: View {
     var body: some View {
         VStack(spacing: 8) {
-            Text("🦙").font(.system(size: 64))
-            Text("Hallo Valerie!").font(.title2.bold())
-            Text("Ich bin Lingo, dein Lama. Leg eine Lektion an und tipp deine neuen Vokabeln ein. Dann kann's losgehen!")
+            Text("So geht's los").font(.title3.bold())
+            Text("Ich bin Lingo, dein Lama. Leg eine Lektion an und tipp deine neuen Vokabeln ein. Mit jedem richtigen Wort verdienst du Sterne für meinen Kleiderschrank!")
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
         }

@@ -74,3 +74,19 @@ struct RewardsTests {
         #expect(Rewards.displayedStreak(current: 4, lastPractice: lastWeek, now: now, calendar: calendar) == 0)
     }
 }
+
+struct WardrobeTests {
+    @Test func catalogIsConsistent() {
+        let ids = Wardrobe.catalog.map(\.id)
+        #expect(Set(ids).count == ids.count)
+        #expect(Wardrobe.catalog.allSatisfy { $0.price > 0 })
+        #expect(Set(Wardrobe.catalog.map(\.slot)) == Set(Slot.allCases))
+    }
+
+    @Test func purchaseRules() {
+        let cap = Wardrobe.accessory(id: "cap")!
+        #expect(Wardrobe.purchaseProblem(for: cap, owned: [], availableStars: 20) == nil)
+        #expect(Wardrobe.purchaseProblem(for: cap, owned: [], availableStars: 5) == .notEnoughStars(missing: 15))
+        #expect(Wardrobe.purchaseProblem(for: cap, owned: ["cap"], availableStars: 100) == .alreadyOwned)
+    }
+}
