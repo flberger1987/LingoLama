@@ -105,3 +105,22 @@ struct HerdTests {
         #expect(Herd.newlyUnlocked(from: 4, to: 4).isEmpty)
     }
 }
+
+struct ExercisesTests {
+    @Test func kindFollowsBox() {
+        #expect(Exercises.kind(box: 1, promptIsEnglish: false, canSpeak: true, variant: 7) == .multipleChoice)
+        #expect(Exercises.kind(box: 2, promptIsEnglish: false, canSpeak: true, variant: 1) == .listening)
+        #expect(Exercises.kind(box: 4, promptIsEnglish: false, canSpeak: true, variant: 3) == .speaking)
+        #expect(Exercises.kind(box: 4, promptIsEnglish: true, canSpeak: true, variant: 3) == .typing)
+        #expect(Exercises.kind(box: 4, promptIsEnglish: false, canSpeak: false, variant: 3) == .typing)
+    }
+
+    @Test func choices() {
+        var generator = SystemRandomNumberGenerator()
+        let options = Exercises.choices(correct: "dog", pool: ["cat", "Dog", "bird", "horse", "cat"], using: &generator)
+        #expect(options?.count == 4)
+        #expect(options?.contains("dog") == true)
+        #expect(Set(options?.map { $0.lowercased() } ?? []).count == 4)
+        #expect(Exercises.choices(correct: "x", pool: ["a", "A", "b"], using: &generator) == nil)
+    }
+}

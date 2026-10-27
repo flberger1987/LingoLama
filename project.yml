@@ -32,6 +32,8 @@ targets:
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
         UISupportedInterfaceOrientations~ipad: [UIInterfaceOrientationPortrait, UIInterfaceOrientationPortraitUpsideDown, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
         ITSAppUsesNonExemptEncryption: false
+        NSMicrophoneUsageDescription: Damit Lingo hören kann, wie du ein englisches Wort aussprichst.
+        NSSpeechRecognitionUsageDescription: Die Spracherkennung prüft direkt auf dem Gerät, ob du das Wort richtig gesagt hast.
         ProxyHost: $(PROXY_HOST)
         AppToken: $(APP_TOKEN)
     settings:

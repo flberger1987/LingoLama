@@ -24,6 +24,10 @@
 	<string>1</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Damit Lingo hören kann, wie du ein englisches Wort aussprichst.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Die Spracherkennung prüft direkt auf dem Gerät, ob du das Wort richtig gesagt hast.</string>
 	<key>ProxyHost</key>
 	<string>$(PROXY_HOST)</string>
 	<key>UILaunchScreen</key>
