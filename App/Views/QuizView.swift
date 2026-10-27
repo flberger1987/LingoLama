@@ -13,7 +13,7 @@ struct QuizView: View {
     @State private var results: [AnswerResult] = []
     @State private var earnedStars = 0
     @State private var levelUp = false
-    @State private var newAnimals: [Animal] = []
+    @State private var newAnimals: [LernAvatar] = []
     @State private var listener = SpeechListener()
     @FocusState private var focused: Bool
 
@@ -189,7 +189,7 @@ struct QuizView: View {
             .disabled(phase != .asking)
 
             if let heard = listener.transcripts.first {
-                Text("Lingo hat gehört: „\(heard)“").foregroundStyle(.secondary)
+                Text("\(progress.companion?.name ?? "Ich") hat gehört: „\(heard)“").foregroundStyle(.secondary)
             }
             if listener.unavailable {
                 Text("Sprechen geht gerade nicht. Tipp das Wort lieber ein.").foregroundStyle(.secondary)
@@ -302,7 +302,7 @@ struct QuizView: View {
         earnedStars += Rewards.stars(for: result)
         if progress.award(result) {
             levelUp = true
-            newAnimals += Herd.newlyUnlocked(from: levelBefore, to: progress.level)
+            newAnimals += progress.newlyUnlocked(from: levelBefore, to: progress.level)
         }
     }
 
@@ -403,10 +403,10 @@ private struct SummaryView: View {
     let results: [AnswerResult]
     let stars: Int
     let levelUp: Bool
-    let newAnimals: [Animal]
+    let newAnimals: [LernAvatar]
     let done: () -> Void
 
-    @State private var shownAnimal: Animal?
+    @State private var shownAnimal: LernAvatar?
 
     private var correct: Int { results.filter { $0 != .wrong }.count }
 
@@ -421,7 +421,7 @@ private struct SummaryView: View {
             ForEach(newAnimals) { animal in
                 Button { shownAnimal = animal } label: {
                     HStack(spacing: 12) {
-                        Text(animal.emoji).font(.system(size: 44))
+                        LernAvatarBild(avatar: animal).frame(width: 56, height: 56)
                         VStack(alignment: .leading) {
                             Text("Neu in deiner Herde!").font(.caption.bold()).foregroundStyle(.tint)
                             Text(animal.name).font(.title3.bold())
@@ -445,6 +445,6 @@ private struct SummaryView: View {
             .buttonStyle(.borderedProminent)
             .buttonBorderShape(.roundedRectangle(radius: 16))
         }
-        .sheet(item: $shownAnimal) { AnimalCard(animal: $0) }
+        .sheet(item: $shownAnimal) { AvatarCard(avatar: $0) }
     }
 }

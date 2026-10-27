@@ -24,7 +24,7 @@ struct HomeView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 20) {
-                    LingoCard { showWardrobe = true }
+                    CompanionCard { showWardrobe = true }
                     ProgressHeader()
                     HerdRow { showHerd = true }
 
@@ -65,6 +65,9 @@ struct HomeView: View {
             }
             .sheet(isPresented: $showWardrobe) { WardrobeView() }
             .sheet(isPresented: $showHerd) { HerdView() }
+            .fullScreenCover(isPresented: Binding(get: { progress.starter == nil }, set: { _ in })) {
+                StarterPickerView()
+            }
         }
     }
 
@@ -82,17 +85,22 @@ struct QuizRequest: Identifiable {
     let mode: QuizMode
 }
 
-private struct LingoCard: View {
+private struct CompanionCard: View {
     @Environment(PlayerProgress.self) private var progress
     let openWardrobe: () -> Void
 
     var body: some View {
         HStack(spacing: 16) {
-            Button(action: openWardrobe) { LingoView(size: 84) }
+            Button(action: openWardrobe) { CompanionView(size: 100) }
                 .buttonStyle(.plain)
             VStack(alignment: .leading, spacing: 6) {
                 Text("Hallo Valerie!").font(.title2.bold())
-                Text(progress.levelTitle).foregroundStyle(.secondary)
+                if let companion = progress.companion {
+                    Text("„\(companion.spruch)\u{2060}“")
+                        .font(.subheadline.italic())
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
                 Button("Kleiderschrank", systemImage: "tshirt.fill", action: openWardrobe)
                     .buttonStyle(.borderedProminent)
                     .controlSize(.small)
@@ -109,19 +117,26 @@ private struct HerdRow: View {
     let open: () -> Void
 
     var body: some View {
-        let herd = Herd.unlocked(atLevel: progress.level)
+        let herd = progress.unlockedHerd
         Button(action: open) {
             HStack(spacing: 12) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Lingos Herde").font(.headline)
-                    if herd.isEmpty {
-                        Text("Ab Level 2 kommt das erste Tier dazu").font(.subheadline).foregroundStyle(.secondary)
-                    } else {
-                        Text(herd.suffix(6).map(\.emoji).joined(separator: " ")).font(.title2)
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Deine Herde").font(.headline)
+                    HStack(spacing: -10) {
+                        ForEach(herd.suffix(6).reversed()) { avatar in
+                            LernAvatarBild(avatar: avatar)
+                                .frame(width: 40, height: 40)
+                                .background(Color("Wool"), in: Circle())
+                                .clipShape(Circle())
+                                .overlay { Circle().strokeBorder(Color("WoolCard"), lineWidth: 2) }
+                        }
+                    }
+                    if herd.count == 1 {
+                        Text("Bei Level 2 kommen die ersten Freunde dazu").font(.caption).foregroundStyle(.secondary)
                     }
                 }
                 Spacer()
-                Text("\(herd.count)/\(Herd.animals.count)").font(.subheadline.bold()).foregroundStyle(.secondary)
+                Text("\(herd.count)/\(progress.herd.count)").font(.subheadline.bold()).foregroundStyle(.secondary)
                 Image(systemName: "chevron.right").foregroundStyle(.tertiary)
             }
             .padding()
@@ -143,7 +158,7 @@ private struct ProgressHeader: View {
                      color: progress.practicedToday ? .orange : .gray)
             }
             ProgressView(value: progress.levelProgress) {
-                Text("Bis Level \(progress.level + 1)").font(.caption).foregroundStyle(.secondary)
+                Text("\(progress.levelTitle) · bis Level \(progress.level + 1)").font(.caption).foregroundStyle(.secondary)
             }
         }
         .padding()
@@ -230,15 +245,15 @@ struct MasteryRing: View {
 }
 
 private struct EmptyHint: View {
-    #if DEBUG
     @Environment(PlayerProgress.self) private var progress
+    #if DEBUG
     @Environment(\.modelContext) private var context
     #endif
 
     var body: some View {
         VStack(spacing: 8) {
             Text("So geht's los").font(.title3.bold())
-            Text("Ich bin Lingo, dein Lama. Leg eine Lektion an und tipp deine neuen Vokabeln ein. Mit jedem richtigen Wort verdienst du Sterne für meinen Kleiderschrank!")
+            Text("Ich bin \(progress.companion?.name ?? "dein Lama"), dein Lernbegleiter. Leg eine Lektion an und tipp deine neuen Vokabeln ein. Mit jedem richtigen Wort verdienst du Sterne für meinen Kleiderschrank!")
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
             #if DEBUG

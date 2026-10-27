@@ -1,24 +1,29 @@
 import SwiftUI
 import VokabelKit
 
-/// Lingo mit allem, was er gerade anhat. Die Accessoires sitzen relativ zur Größe auf dem Lama-Emoji.
-struct LingoView: View {
+/// Der Lernbegleiter mit allem, was er gerade anhat. Die Accessoires sitzen relativ zur Bildgröße auf dem Porträt.
+struct CompanionView: View {
     @Environment(PlayerProgress.self) private var progress
     var size: CGFloat = 100
 
     var body: some View {
-        Text("🦙")
-            .font(.system(size: size))
-            .overlay {
-                ForEach(Slot.allCases, id: \.self) { slot in
-                    if let item = progress.wearing(slot) {
-                        Text(item.emoji)
-                            .font(.system(size: size * slot.scale))
-                            .offset(x: size * slot.offset.x, y: size * slot.offset.y)
-                    }
+        Group {
+            if let avatar = progress.companion {
+                LernAvatarBild(avatar: avatar)
+            } else {
+                Text("🦙").font(.system(size: size * 0.8))
+            }
+        }
+        .frame(width: size, height: size)
+        .overlay {
+            ForEach(Slot.allCases, id: \.self) { slot in
+                if let item = progress.wearing(slot) {
+                    Text(item.emoji)
+                        .font(.system(size: size * slot.scale))
+                        .offset(x: size * slot.offset.x, y: size * slot.offset.y)
                 }
             }
-            .accessibilityLabel("Lingo, dein Lama")
+        }
     }
 }
 
@@ -32,22 +37,23 @@ extension Slot {
         }
     }
 
-    /// Position der Mitte des Accessoires, relativ zur Mitte des Lamas, in Vielfachen der Schriftgröße.
+    /// Position der Mitte des Accessoires, relativ zur Bildmitte, in Vielfachen der Bildgröße.
+    /// Alle Avatare sind gleich aufgebaut: Ohren oben, Augen knapp über der Mitte, Hals unten.
     fileprivate var offset: CGPoint {
         switch self {
-        case .head: CGPoint(x: -0.28, y: -0.58)
-        case .eyes: CGPoint(x: -0.34, y: -0.36)
-        case .neck: CGPoint(x: -0.24, y: -0.12)
-        case .extra: CGPoint(x: 0.15, y: -0.10)
+        case .head: CGPoint(x: 0.02, y: -0.37)
+        case .eyes: CGPoint(x: 0.03, y: -0.03)
+        case .neck: CGPoint(x: 0, y: 0.34)
+        case .extra: CGPoint(x: 0.3, y: -0.22)
         }
     }
 
     fileprivate var scale: CGFloat {
         switch self {
-        case .head: 0.35
-        case .eyes: 0.2
-        case .neck: 0.28
-        case .extra: 0.3
+        case .head: 0.34
+        case .eyes: 0.3
+        case .neck: 0.32
+        case .extra: 0.2
         }
     }
 }
@@ -62,9 +68,9 @@ struct WardrobeView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
                     VStack(spacing: 12) {
-                        LingoView(size: 160)
+                        CompanionView(size: 200)
                             .frame(maxWidth: .infinity)
-                            .padding(.top, 40)
+                            .padding(.top, 8)
                         Label {
                             Text("\(progress.availableStars) Sterne zum Ausgeben").bold()
                         } icon: {
@@ -97,7 +103,7 @@ struct WardrobeView: View {
                 Button("Kaufen für \(item.price) ⭐️") { withAnimation { progress.buy(item) } }
                 Button("Lieber nicht", role: .cancel) {}
             } message: { item in
-                Text("\(item.emoji) \(item.name) für Lingo?")
+                Text("\(item.emoji) \(item.name) für \(progress.companion?.name ?? "dein Lama")?")
             }
             .animation(.spring(duration: 0.3), value: progress.availableStars)
         }

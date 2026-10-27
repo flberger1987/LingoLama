@@ -92,17 +92,23 @@ struct WardrobeTests {
 }
 
 struct HerdTests {
-    @Test func oneAnimalPerLevelFromTwo() {
-        #expect(Herd.animals.map(\.unlockLevel) == Array(2...(Herd.animals.count + 1)))
-        #expect(Set(Herd.animals.map(\.id)).count == Herd.animals.count)
+    @Test func starterComesFirst() {
+        #expect(Herd.order(of: ["a", "b", "c", "d"], starter: "c") == ["c", "a", "b", "d"])
     }
 
-    @Test func unlocking() {
-        #expect(Herd.unlocked(atLevel: 1).isEmpty)
-        #expect(Herd.unlocked(atLevel: 4).map(\.id) == ["frog", "macaw", "bear"])
-        #expect(Herd.newlyUnlocked(from: 3, to: 4).map(\.id) == ["bear"])
-        #expect(Herd.newlyUnlocked(from: 2, to: 4).count == 2)
-        #expect(Herd.newlyUnlocked(from: 4, to: 4).isEmpty)
+    @Test func twoAnimalsPerLevel() {
+        #expect(Herd.unlockedCount(atLevel: 1, total: 21) == 1)
+        #expect(Herd.unlockedCount(atLevel: 2, total: 21) == 3)
+        #expect(Herd.unlockedCount(atLevel: 11, total: 21) == 21)
+        #expect(Herd.unlockedCount(atLevel: 30, total: 21) == 21)
+        #expect(Herd.unlockLevel(position: 0) == 1)
+        #expect(Herd.unlockLevel(position: 1) == 2)
+        #expect(Herd.unlockLevel(position: 2) == 2)
+        #expect(Herd.unlockLevel(position: 20) == 11)
+        // Beide Rechnungen passen zusammen.
+        for position in 0..<21 {
+            #expect(Herd.unlockedCount(atLevel: Herd.unlockLevel(position: position), total: 21) > position)
+        }
     }
 }
 
