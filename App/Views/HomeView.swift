@@ -230,12 +230,24 @@ struct MasteryRing: View {
 }
 
 private struct EmptyHint: View {
+    #if DEBUG
+    @Environment(PlayerProgress.self) private var progress
+    @Environment(\.modelContext) private var context
+    #endif
+
     var body: some View {
         VStack(spacing: 8) {
             Text("So geht's los").font(.title3.bold())
             Text("Ich bin Lingo, dein Lama. Leg eine Lektion an und tipp deine neuen Vokabeln ein. Mit jedem richtigen Wort verdienst du Sterne für meinen Kleiderschrank!")
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
+            #if DEBUG
+            Button("Demodaten laden", systemImage: "wand.and.stars") {
+                withAnimation { DemoData.load(into: context, progress: progress) }
+            }
+            .buttonStyle(.bordered)
+            .padding(.top, 4)
+            #endif
         }
         .padding()
         .frame(maxWidth: .infinity)

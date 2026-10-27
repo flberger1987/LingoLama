@@ -74,6 +74,16 @@ final class PlayerProgress {
         outfit[item.slot.rawValue] = isWearing(item) ? nil : item.id
     }
 
+    #if DEBUG
+    /// Für die Demodaten: Sterne setzen, Kleiderschrank leeren.
+    func setDemoStars(_ value: Int) {
+        stars = value
+        spentStars = 0
+        owned = []
+        outfit = [:]
+    }
+    #endif
+
     /// Lama-Rang pro Level, ab dem letzten bleibt er gleich.
     private static let levelTitles = [
         "Lama-Baby", "Kleines Lama", "Wolliges Lama", "Flinkes Lama", "Kletter-Lama",
