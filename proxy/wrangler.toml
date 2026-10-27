@@ -1,0 +1,17 @@
+name = "vokabel-proxy"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+
+[vars]
+# Günstiger: "claude-haiku-5-5"
+MODEL = "claude-opus-5-5"
+DAILY_LIMIT = "300"
+
+# Mit `npx wrangler kv namespace create USAGE` anlegen und die id hier eintragen.
+[[kv_namespaces]]
+binding = "USAGE"
+id = "HIER_KV_ID_EINTRAGEN"
+
+# Secrets (nicht hier eintragen!):
+#   npx wrangler secret put ANTHROPIC_API_KEY
+#   npx wrangler secret put APP_TOKEN

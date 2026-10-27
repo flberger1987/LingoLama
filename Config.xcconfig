@@ -1,0 +1,6 @@
+// Werte für den KI-Proxy. Echte Werte in Secrets.xcconfig eintragen (nicht im Git).
+// Kein "https://" hier – "//" leitet in xcconfig einen Kommentar ein.
+PROXY_HOST = vokabel-proxy.DEIN-NAME.workers.dev
+APP_TOKEN =
+
+#include? "Secrets.xcconfig"
