@@ -46,8 +46,8 @@ struct HomeView: View {
                 }
                 .padding()
             }
-            .background(Color(.systemGroupedBackground))
-            .navigationTitle("VokabelHeld")
+            .background(Color("Wool"))
+            .navigationTitle("LingoLama")
             .navigationDestination(for: Lesson.self) { LessonView(lesson: $0) }
             .alert("Neue Lektion", isPresented: $showNewLesson) {
                 TextField("z. B. Unit 3", text: $newLessonName)
@@ -80,18 +80,17 @@ private struct ProgressHeader: View {
     var body: some View {
         VStack(spacing: 14) {
             HStack(spacing: 12) {
-                Stat(value: "\(progress.level)", label: "Level", symbol: "crown.fill", color: .purple)
+                Stat(value: "\(progress.level)", label: "Level", symbol: "crown.fill", color: .accentColor)
                 Stat(value: "\(progress.stars)", label: "Sterne", symbol: "star.fill", color: .yellow)
                 Stat(value: "\(progress.streak)", label: progress.streak == 1 ? "Tag" : "Tage", symbol: "flame.fill",
                      color: progress.practicedToday ? .orange : .gray)
             }
             ProgressView(value: progress.levelProgress) {
-                Text("Bis Level \(progress.level + 1)").font(.caption).foregroundStyle(.secondary)
+                Text("🦙 \(progress.levelTitle) · bis Level \(progress.level + 1)").font(.caption).foregroundStyle(.secondary)
             }
-            .tint(.purple)
         }
         .padding()
-        .background(.background, in: RoundedRectangle(cornerRadius: 20))
+        .background(Color("WoolCard"), in: RoundedRectangle(cornerRadius: 20))
     }
 
     private struct Stat: View {
@@ -153,7 +152,7 @@ private struct LessonRow: View {
             Image(systemName: "chevron.right").foregroundStyle(.tertiary)
         }
         .padding()
-        .background(.background, in: RoundedRectangle(cornerRadius: 16))
+        .background(Color("WoolCard"), in: RoundedRectangle(cornerRadius: 16))
     }
 }
 
@@ -176,13 +175,14 @@ struct MasteryRing: View {
 private struct EmptyHint: View {
     var body: some View {
         VStack(spacing: 8) {
-            Text("👋 Hallo Valerie!").font(.title2.bold())
-            Text("Leg eine Lektion an und tipp deine neuen Vokabeln ein. Dann kann's losgehen.")
+            Text("🦙").font(.system(size: 64))
+            Text("Hallo Valerie!").font(.title2.bold())
+            Text("Ich bin Lingo, dein Lama. Leg eine Lektion an und tipp deine neuen Vokabeln ein. Dann kann's losgehen!")
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
         }
         .padding()
         .frame(maxWidth: .infinity)
-        .background(.background, in: RoundedRectangle(cornerRadius: 20))
+        .background(Color("WoolCard"), in: RoundedRectangle(cornerRadius: 20))
     }
 }

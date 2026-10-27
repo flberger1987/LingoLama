@@ -19,6 +19,7 @@ final class PlayerProgress {
     }
 
     var level: Int { Rewards.level(forStars: stars) }
+    var levelTitle: String { Self.levelTitles[min(level, Self.levelTitles.count) - 1] }
     var levelProgress: Double { Rewards.levelProgress(forStars: stars) }
     var streak: Int { Rewards.displayedStreak(current: streakCount, lastPractice: lastPractice, now: .now) }
     var practicedToday: Bool { lastPractice.map(Calendar.current.isDateInToday) ?? false }
@@ -35,4 +36,10 @@ final class PlayerProgress {
         streakCount = Rewards.streak(current: streakCount, lastPractice: lastPractice, now: now)
         lastPractice = now
     }
+
+    /// Lama-Rang pro Level, ab dem letzten bleibt er gleich.
+    private static let levelTitles = [
+        "Lama-Baby", "Kleines Lama", "Wolliges Lama", "Flinkes Lama", "Kletter-Lama",
+        "Berg-Lama", "Anden-Lama", "Lama-Profi", "Lama-Champion", "Lama-Legende",
+    ]
 }

@@ -38,6 +38,8 @@ struct QuizView: View {
             }
             .padding()
             .frame(maxWidth: 600)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color("Wool"))
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Beenden", systemImage: "xmark") { finish() }
@@ -192,9 +194,9 @@ struct QuizView: View {
 extension AnswerResult {
     func title(variant: Int) -> String {
         switch self {
-        case .correct: ["Super! ⭐️⭐️", "Richtig! ⭐️⭐️", "Genau! ⭐️⭐️", "Klasse! ⭐️⭐️"][variant % 4]
+        case .correct: ["Lamastisch! ⭐️⭐️", "Richtig! ⭐️⭐️", "Super, Lama! ⭐️⭐️", "Genau! ⭐️⭐️"][variant % 4]
         case .almost: "Fast richtig! ⭐️"
-        case .wrong: "Noch nicht ganz"
+        case .wrong: "Kein Drama, Lama!"
         }
     }
 
@@ -219,9 +221,10 @@ private struct SummaryView: View {
     var body: some View {
         VStack(spacing: 20) {
             Spacer()
-            Text(levelUp ? "🎉" : correct == results.count ? "🏆" : "💪").font(.system(size: 90))
+            Text(levelUp ? "🎉" : correct == results.count ? "🦙" : "💪").font(.system(size: 90))
             if levelUp {
-                Text("Level \(progress.level) erreicht!").font(.largeTitle.bold()).foregroundStyle(.purple)
+                Text("Level \(progress.level) erreicht!").font(.largeTitle.bold()).foregroundStyle(.tint)
+                Text("Du bist jetzt: \(progress.levelTitle) 🦙").font(.title3)
             }
             Text("\(correct) von \(results.count) gewusst").font(.title.bold())
             Label("+\(stars) Sterne", systemImage: "star.fill").font(.title2).foregroundStyle(.yellow)

@@ -37,6 +37,8 @@ struct LessonView: View {
                 Button("Wörter hinzufügen", systemImage: "plus") { showAdd = true }
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(Color("Wool"))
         .navigationTitle(lesson.name)
         .toolbar {
             Button("Hinzufügen", systemImage: "plus") { showAdd = true }

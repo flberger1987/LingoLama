@@ -1,4 +1,4 @@
-# VokabelHeld
+# LingoLama 🦙
 
 Englisch-Vokabel-App für Valerie. Konzept: [KONZEPT.md](KONZEPT.md).
 
@@ -34,7 +34,7 @@ APP_TOKEN = <derselbe Token wie oben>
 
 ```sh
 xcodegen generate
-open VokabelHeld.xcodeproj
+open LingoLama.xcodeproj
 ```
 
 In Xcode unter *Signing & Capabilities* dein Team wählen, dann auf Simulator oder iPhone starten.

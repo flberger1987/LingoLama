@@ -2,7 +2,7 @@ import SwiftData
 import SwiftUI
 
 @main
-struct VokabelHeldApp: App {
+struct LingoLamaApp: App {
     @State private var progress = PlayerProgress()
 
     var body: some Scene {
