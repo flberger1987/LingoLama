@@ -49,7 +49,7 @@ struct QuizView: View {
             .background(Color("Wool"))
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Beenden", systemImage: "xmark") { finish() }
+                    Button("Stop", systemImage: "xmark") { finish() }
                 }
                 ToolbarItem(placement: .principal) {
                     if phase != .finished, !steps.isEmpty {
@@ -77,11 +77,11 @@ struct QuizView: View {
                             .padding(28)
                             .background(Color.accentColor.opacity(0.15), in: Circle())
                     }
-                    .accessibilityLabel("Anhören")
+                    .accessibilityLabel("Listen")
                     Button { Speaker.shared.speak(card.word.english, slow: true) } label: {
                         Image(systemName: "tortoise.fill").font(.title)
                     }
-                    .accessibilityLabel("Langsam anhören")
+                    .accessibilityLabel("Listen slowly")
                 }
             } else {
                 HStack(spacing: 12) {
@@ -103,7 +103,7 @@ struct QuizView: View {
             case .speaking:
                 speakingInput(card)
             case .typing, .listening:
-                TextField(kind == .listening || card.direction == .deToEn ? "English" : "Deutsch", text: $answer)
+                TextField(kind == .listening || card.direction == .deToEn ? "English" : "German", text: $answer)
                     .font(.title2)
                     .multilineTextAlignment(.center)
                     .textInputAutocapitalization(.never)
@@ -125,8 +125,8 @@ struct QuizView: View {
                     Group {
                         switch phase {
                         case .checking: ProgressView()
-                        case .feedback: Text(index + 1 < steps.count ? "Weiter" : "Fertig")
-                        default: Text("Prüfen")
+                        case .feedback: Text(index + 1 < steps.count ? "Next" : "Done")
+                        default: Text("Check")
                         }
                     }
                     .font(.title3.bold())
@@ -178,7 +178,7 @@ struct QuizView: View {
                     if listener.isListening { _ = await listener.finish() } else { await listener.start() }
                 }
             } label: {
-                Label(listener.isListening ? "Fertig gesprochen" : "Tippen und sprechen",
+                Label(listener.isListening ? "I'm done" : "Tap and speak",
                       systemImage: listener.isListening ? "stop.circle.fill" : "mic.circle.fill")
                     .font(.title3.bold())
                     .frame(maxWidth: .infinity)
@@ -189,13 +189,13 @@ struct QuizView: View {
             .disabled(phase != .asking)
 
             if let heard = listener.transcripts.first {
-                Text("\(progress.companion?.name ?? "Ich") hat gehört: „\(heard)“").foregroundStyle(.secondary)
+                Text("\(progress.companion?.name ?? "I") heard: “\(heard)”").foregroundStyle(.secondary)
             }
             if listener.unavailable {
-                Text("Sprechen geht gerade nicht. Tipp das Wort lieber ein.").foregroundStyle(.secondary)
+                Text("Speaking doesn't work right now. Please type the word.").foregroundStyle(.secondary)
             }
             if phase == .asking {
-                Button("Lieber tippen") { switchToTyping(card) }.font(.subheadline)
+                Button("Type instead") { switchToTyping(card) }.font(.subheadline)
             }
         }
     }
@@ -214,7 +214,7 @@ struct QuizView: View {
                     Button { Speaker.shared.speak(card.word.english, slow: true) } label: {
                         Image(systemName: "tortoise.fill")
                     }
-                    .accessibilityLabel("Langsam vorlesen")
+                    .accessibilityLabel("Read slowly")
                 }
                 if !card.word.example.isEmpty {
                     Text(card.word.example).font(.callout).italic().foregroundStyle(.secondary)
@@ -254,12 +254,12 @@ struct QuizView: View {
             guard let first = heard.first else { return }
             answer = first
             result = Self.bestSpoken(heard, expected: expected)
-            if result == .almost { message = "Fast! Sag es noch einmal ganz deutlich." }
+            if result == .almost { message = "Almost! Say it again nice and clearly." }
         case .typing, .listening:
             guard !answer.trimmingCharacters(in: .whitespaces).isEmpty else { return }
             switch AnswerChecker.check(answer: answer, expected: expected) {
             case .correct: result = .correct
-            case .almost: result = .almost; message = "Fast! Achte auf die Schreibweise."
+            case .almost: result = .almost; message = "Almost! Check the spelling."
             case .wrong: result = .wrong
             case .unsure:
                 phase = .checking
@@ -271,7 +271,7 @@ struct QuizView: View {
                 } catch {
                     // Ohne KI lieber gnädig sein, statt ein mögliches Synonym als falsch zu werten.
                     result = .almost
-                    message = "Vergleiche selbst mit der Lösung."
+                    message = "Compare it with the answer yourself."
                 }
             }
         }
@@ -373,9 +373,9 @@ enum QuizStep {
 extension ExerciseKind {
     func instruction(_ direction: Direction) -> String {
         switch self {
-        case .listening: "Hör zu und schreib das englische Wort"
-        case .speaking: "Sag es auf Englisch!"
-        case .multipleChoice, .typing: direction == .deToEn ? "Wie heißt das auf Englisch?" : "Was bedeutet das auf Deutsch?"
+        case .listening: "Listen and write the English word"
+        case .speaking: "Say it in English!"
+        case .multipleChoice, .typing: direction == .deToEn ? "How do you say this in English?" : "What does this mean in German?"
         }
     }
 }
@@ -383,9 +383,9 @@ extension ExerciseKind {
 extension AnswerResult {
     func title(variant: Int) -> String {
         switch self {
-        case .correct: ["Lamastisch! ⭐️⭐️", "Richtig! ⭐️⭐️", "Super, Lama! ⭐️⭐️", "Genau! ⭐️⭐️"][variant % 4]
-        case .almost: "Fast richtig! ⭐️"
-        case .wrong: "Kein Drama, Lama!"
+        case .correct: ["Llamazing! ⭐️⭐️", "Correct! ⭐️⭐️", "Super, llama! ⭐️⭐️", "Exactly! ⭐️⭐️"][variant % 4]
+        case .almost: "Almost right! ⭐️"
+        case .wrong: "No drama, llama!"
         }
     }
 
@@ -415,15 +415,15 @@ private struct SummaryView: View {
             Spacer()
             Text(levelUp ? "🎉" : correct == results.count ? "🦙" : "💪").font(.system(size: 90))
             if levelUp {
-                Text("Level \(progress.level) erreicht!").font(.largeTitle.bold()).foregroundStyle(.tint)
-                Text("Du bist jetzt: \(progress.levelTitle) 🦙").font(.title3)
+                Text("Level \(progress.level) reached!").font(.largeTitle.bold()).foregroundStyle(.tint)
+                Text("You are now: \(progress.levelTitle) 🦙").font(.title3)
             }
             ForEach(newAnimals) { animal in
                 Button { shownAnimal = animal } label: {
                     HStack(spacing: 12) {
                         LernAvatarBild(avatar: animal).frame(width: 56, height: 56)
                         VStack(alignment: .leading) {
-                            Text("Neu in deiner Herde!").font(.caption.bold()).foregroundStyle(.tint)
+                            Text("New in your herd!").font(.caption.bold()).foregroundStyle(.tint)
                             Text(animal.name).font(.title3.bold())
                         }
                         Spacer()
@@ -434,13 +434,13 @@ private struct SummaryView: View {
                 }
                 .buttonStyle(.plain)
             }
-            Text("\(correct) von \(results.count) gewusst").font(.title.bold())
-            Label("+\(stars) Sterne", systemImage: "star.fill").font(.title2).foregroundStyle(.yellow)
-            Label("\(progress.streak) \(progress.streak == 1 ? "Tag" : "Tage") in Folge", systemImage: "flame.fill")
+            Text("\(correct) of \(results.count) right").font(.title.bold())
+            Label("+\(stars) stars", systemImage: "star.fill").font(.title2).foregroundStyle(.yellow)
+            Label("\(progress.streak) \(progress.streak == 1 ? "day" : "days") in a row", systemImage: "flame.fill")
                 .font(.title3).foregroundStyle(.orange)
             Spacer()
             Button(action: done) {
-                Text("Zurück").font(.title3.bold()).frame(maxWidth: .infinity).padding(.vertical, 8)
+                Text("Back").font(.title3.bold()).frame(maxWidth: .infinity).padding(.vertical, 8)
             }
             .buttonStyle(.borderedProminent)
             .buttonBorderShape(.roundedRectangle(radius: 16))

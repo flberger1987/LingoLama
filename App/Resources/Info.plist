@@ -25,9 +25,9 @@
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Damit dein Lernbegleiter hören kann, wie du ein englisches Wort aussprichst.</string>
+	<string>So your learning buddy can hear you say English words.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>Die Spracherkennung prüft direkt auf dem Gerät, ob du das Wort richtig gesagt hast.</string>
+	<string>Speech recognition checks on this device if you said the word right.</string>
 	<key>ProxyHost</key>
 	<string>$(PROXY_HOST)</string>
 	<key>UILaunchScreen</key>

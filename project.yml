@@ -32,8 +32,8 @@ targets:
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
         UISupportedInterfaceOrientations~ipad: [UIInterfaceOrientationPortrait, UIInterfaceOrientationPortraitUpsideDown, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
         ITSAppUsesNonExemptEncryption: false
-        NSMicrophoneUsageDescription: Damit dein Lernbegleiter hören kann, wie du ein englisches Wort aussprichst.
-        NSSpeechRecognitionUsageDescription: Die Spracherkennung prüft direkt auf dem Gerät, ob du das Wort richtig gesagt hast.
+        NSMicrophoneUsageDescription: So your learning buddy can hear you say English words.
+        NSSpeechRecognitionUsageDescription: Speech recognition checks on this device if you said the word right.
         ProxyHost: $(PROXY_HOST)
         AppToken: $(APP_TOKEN)
     settings:

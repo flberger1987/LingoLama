@@ -26,7 +26,7 @@ struct ProxyClient {
 
         var errorDescription: String? {
             switch self {
-            case .notConfigured: "Die KI ist noch nicht eingerichtet."
+            case .notConfigured: "The AI is not set up yet."
             case .server(let message): message
             }
         }
@@ -69,7 +69,7 @@ struct ProxyClient {
         let status = (response as? HTTPURLResponse)?.statusCode ?? 0
         guard status == 200 else {
             let message = (try? JSONDecoder().decode(ErrorBody.self, from: data))?.error
-            throw ProxyError.server(message ?? "Die KI ist gerade nicht erreichbar (\(status)).")
+            throw ProxyError.server(message ?? "The AI can't be reached right now (\(status)).")
         }
         return try JSONDecoder().decode(T.self, from: data)
     }

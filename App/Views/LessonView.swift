@@ -20,12 +20,12 @@ struct LessonView: View {
                             Button(mode.label) { quiz = QuizRequest(words: lesson.words, mode: mode) }
                         }
                     } label: {
-                        Label("Diese Lektion üben", systemImage: "play.fill").font(.headline)
+                        Label("Practise this lesson", systemImage: "play.fill").font(.headline)
                     }
                 }
             }
 
-            Section("\(words.count) Wörter") {
+            Section("\(words.count) words") {
                 ForEach(words) { word in
                     Button { editing = word } label: { WordRow(word: word) }
                         .buttonStyle(.plain)
@@ -34,22 +34,22 @@ struct LessonView: View {
                     for index in offsets { context.delete(words[index]) }
                 }
 
-                Button("Wörter hinzufügen", systemImage: "plus") { showAdd = true }
+                Button("Add words", systemImage: "plus") { showAdd = true }
             }
         }
         .scrollContentBackground(.hidden)
         .background(Color("Wool"))
         .navigationTitle(lesson.name)
         .toolbar {
-            Button("Hinzufügen", systemImage: "plus") { showAdd = true }
+            Button("Add", systemImage: "plus") { showAdd = true }
         }
         .sheet(isPresented: $showAdd) { AddWordsView(lesson: lesson) }
         .sheet(item: $editing) { EditWordView(word: $0) }
         .fullScreenCover(item: $quiz) { QuizView(words: $0.words, mode: $0.mode) }
         .overlay {
             if words.isEmpty {
-                ContentUnavailableView("Noch keine Wörter", systemImage: "text.book.closed",
-                                       description: Text("Tipp oben auf + und gib die englischen Wörter ein."))
+                ContentUnavailableView("No words yet", systemImage: "text.book.closed",
+                                       description: Text("Tap + at the top and type in the English words."))
             }
         }
     }
@@ -82,11 +82,11 @@ struct EditWordView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Englisch") { TextField("english", text: $word.english).textInputAutocapitalization(.never) }
-                Section("Deutsch") { TextField("Deutsch", text: $word.german) }
-                Section("Beispielsatz") { TextField("Example", text: $word.example, axis: .vertical) }
+                Section("English") { TextField("english", text: $word.english).textInputAutocapitalization(.never) }
+                Section("German") { TextField("German", text: $word.german) }
+                Section("Example sentence") { TextField("Example", text: $word.example, axis: .vertical) }
                 Section {
-                    Button("Neu lernen (zurück in Fach 1)") {
+                    Button("Learn again (back to box 1)") {
                         word.boxDeEn = 1; word.boxEnDe = 1
                         word.dueDeEn = .distantPast; word.dueEnDe = .distantPast
                     }
@@ -94,7 +94,7 @@ struct EditWordView: View {
             }
             .navigationTitle(word.english)
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar { Button("Fertig") { dismiss() } }
+            .toolbar { Button("Done") { dismiss() } }
         }
     }
 }

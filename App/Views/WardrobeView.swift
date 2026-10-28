@@ -24,6 +24,8 @@ struct CompanionView: View {
                     let place = item.placement(on: avatar)
                     Text(item.emoji)
                         .font(.system(size: size * place.scale))
+                        .scaleEffect(x: place.stretch, y: 1)
+                        .rotationEffect(.degrees(place.rotation))
                         .offset(x: size * place.x, y: size * place.y)
                 }
             }
@@ -46,19 +48,22 @@ struct CompanionView: View {
 extension Slot {
     var title: String {
         switch self {
-        case .head: "Kopf"
-        case .eyes: "Augen"
-        case .neck: "Hals"
+        case .head: "Head"
+        case .eyes: "Eyes"
+        case .neck: "Neck"
         case .extra: "Extras"
         }
     }
 }
 
 /// Wo ein Teil sitzt: Mitte relativ zur Bildmitte und Größe, jeweils in Vielfachen der Bildgröße.
+/// Dazu Drehung im Uhrzeigersinn und Stauchung in der Breite, damit es zu geneigten Köpfen passt.
 struct Placement {
     let x: CGFloat
     let y: CGFloat
     let scale: CGFloat
+    var rotation: Double = 0
+    var stretch: CGFloat = 1
 
     /// Die Hoftiere sind gleich aufgebaut: Ohren oben, Augen knapp über der Mitte, Hals unten.
     fileprivate static let standard: [String: Placement] = [
@@ -79,20 +84,21 @@ struct Placement {
         "butterfly": .init(x: 0.34, y: -0.36, scale: 0.18),
     ]
 
-    /// Mr. Right ist nach eigenem Foto gezeichnet: Kopf leicht gedreht, Augen höher, langer schmaler Hals mit Halfter.
+    /// Mr. Right ist nach eigenem Foto gezeichnet: Kopf um etwa 8° im Uhrzeigersinn geneigt und leicht gedreht,
+    /// Augen höher, langer schmaler Hals mit Halfter. Hüte und Brillen kippen deshalb mit.
     fileprivate static let mrRight: [String: Placement] = [
-        "cap": .init(x: 0.03, y: -0.27, scale: 0.36),
-        "sunhat": .init(x: 0.02, y: -0.31, scale: 0.40),
-        "tophat": .init(x: 0.02, y: -0.33, scale: 0.34),
-        "crown": .init(x: 0.02, y: -0.29, scale: 0.30),
-        "gradcap": .init(x: 0.02, y: -0.29, scale: 0.34),
-        "glasses": .init(x: 0.03, y: -0.09, scale: 0.30),
-        "sunglasses": .init(x: 0.03, y: -0.09, scale: 0.30),
-        "bell": .init(x: 0.02, y: 0.20, scale: 0.16),
-        "bow": .init(x: 0.02, y: 0.19, scale: 0.20),
-        "scarf": .init(x: 0.02, y: 0.30, scale: 0.26),
-        "flower": .init(x: 0.30, y: -0.22, scale: 0.18),
-        "sunflower": .init(x: -0.28, y: -0.22, scale: 0.18),
+        "cap": .init(x: 0.03, y: -0.30, scale: 0.36, rotation: 8),
+        "sunhat": .init(x: 0.03, y: -0.33, scale: 0.40, rotation: 8),
+        "tophat": .init(x: 0.03, y: -0.36, scale: 0.32, rotation: 8),
+        "crown": .init(x: 0.03, y: -0.32, scale: 0.28, rotation: 8),
+        "gradcap": .init(x: 0.03, y: -0.32, scale: 0.32, rotation: 8),
+        "glasses": .init(x: 0.01, y: -0.10, scale: 0.28, rotation: 8, stretch: 0.95),
+        "sunglasses": .init(x: 0.01, y: -0.10, scale: 0.28, rotation: 8, stretch: 0.95),
+        "bell": .init(x: 0.10, y: 0.20, scale: 0.14),
+        "bow": .init(x: 0.02, y: 0.24, scale: 0.18, rotation: 8),
+        "scarf": .init(x: 0.02, y: 0.30, scale: 0.25, stretch: 0.9),
+        "flower": .init(x: 0.24, y: -0.30, scale: 0.17, rotation: 20),
+        "sunflower": .init(x: -0.17, y: -0.33, scale: 0.17, rotation: -15),
     ]
 
     static func mouth(of avatar: LernAvatar?) -> Placement {
@@ -123,7 +129,7 @@ struct WardrobeView: View {
                             .frame(maxWidth: .infinity)
                             .padding(.top, 8)
                         Label {
-                            Text("\(progress.availableStars) Sterne zum Ausgeben").bold()
+                            Text("\(progress.availableStars) stars to spend").bold()
                         } icon: {
                             Image(systemName: "star.fill").foregroundStyle(.yellow)
                         }
@@ -149,14 +155,14 @@ struct WardrobeView: View {
                 .padding()
             }
             .background(Color("Wool"))
-            .navigationTitle("Kleiderschrank")
+            .navigationTitle("Rewards")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar { Button("Fertig") { dismiss() } }
-            .alert("Kaufen?", isPresented: Binding(get: { toBuy != nil }, set: { if !$0 { toBuy = nil } }), presenting: toBuy) { item in
-                Button("Kaufen für \(item.price) ⭐️") { withAnimation { progress.buy(item) } }
-                Button("Lieber nicht", role: .cancel) {}
+            .toolbar { Button("Done") { dismiss() } }
+            .alert("Buy it?", isPresented: Binding(get: { toBuy != nil }, set: { if !$0 { toBuy = nil } }), presenting: toBuy) { item in
+                Button("Buy for \(item.price) ⭐️") { withAnimation { progress.buy(item) } }
+                Button("Not now", role: .cancel) {}
             } message: { item in
-                Text("\(item.emoji) \(item.name) für \(progress.companion?.name ?? "dein Lama")?")
+                Text("\(item.emoji) \(item.name) for \(progress.companion?.name ?? "your llama")?")
             }
             .animation(.spring(duration: 0.3), value: progress.availableStars)
         }
@@ -165,10 +171,10 @@ struct WardrobeView: View {
     private var treats: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline) {
-                Text("Leckerli").font(.title3.bold())
+                Text("Treats").font(.title3.bold())
                 Spacer()
                 if progress.treatsFed > 0 {
-                    Text("schon \(progress.treatsFed) verfüttert").font(.caption).foregroundStyle(.secondary)
+                    Text(progress.treatsFed == 1 ? "1 treat so far" : "\(progress.treatsFed) treats so far").font(.caption).foregroundStyle(.secondary)
                 }
             }
             HStack(spacing: 10) {
@@ -222,9 +228,9 @@ private struct ItemTile: View {
             Text(item.name).font(.subheadline.bold()).lineLimit(1).minimumScaleFactor(0.8)
             Group {
                 switch problem {
-                case .alreadyOwned: Text(wearing ? "Angezogen ✓" : "Anziehen")
+                case .alreadyOwned: Text(wearing ? "Wearing ✓" : "Put on")
                 case nil: Text("\(item.price) ⭐️")
-                case .notEnoughStars(let missing): Text("🔒 noch \(missing) ⭐️")
+                case .notEnoughStars(let missing): Text("🔒 \(missing) more ⭐️")
                 }
             }
             .font(.caption)

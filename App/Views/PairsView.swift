@@ -24,8 +24,8 @@ struct PairsView: View {
     var body: some View {
         VStack(spacing: 24) {
             Spacer()
-            Text("Aufwärmen").font(.headline).foregroundStyle(.secondary)
-            Text("Finde die Paare!").font(.title.bold())
+            Text("Warm-up").font(.headline).foregroundStyle(.secondary)
+            Text("Find the pairs!").font(.title.bold())
             HStack(alignment: .top, spacing: 12) {
                 VStack(spacing: 10) {
                     ForEach(left) { word in

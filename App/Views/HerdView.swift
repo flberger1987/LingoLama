@@ -12,7 +12,7 @@ struct HerdView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 20) {
-                    Text("\(unlocked.count) von \(progress.herd.count) Tieren gesammelt")
+                    Text("\(unlocked.count) of \(progress.herd.count) animals collected")
                         .font(.headline)
                         .foregroundStyle(.secondary)
 
@@ -32,9 +32,9 @@ struct HerdView: View {
                 .padding()
             }
             .background(Color("Wool"))
-            .navigationTitle("Deine Herde")
+            .navigationTitle("Your herd")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar { Button("Fertig") { dismiss() } }
+            .toolbar { Button("Done") { dismiss() } }
             .sheet(item: $selected) { AvatarCard(avatar: $0) }
         }
     }
@@ -48,7 +48,7 @@ private struct AvatarTile: View {
         VStack(spacing: 4) {
             LernAvatarBild(avatar: avatar).frame(height: 88)
             Text(avatar.name).font(.subheadline.bold()).lineLimit(1).minimumScaleFactor(0.7)
-            Text(isCompanion ? "Begleiter ✓" : avatar.tierart)
+            Text(isCompanion ? "Buddy ✓" : avatar.species)
                 .font(.caption)
                 .foregroundStyle(isCompanion ? Color.accentColor : .secondary)
         }
@@ -76,7 +76,7 @@ private struct LockedTile: View {
                 .frame(height: 88)
                 .accessibilityHidden(true)
             Text("???").font(.subheadline.bold()).foregroundStyle(.secondary)
-            Label("ab Level \(level)", systemImage: "lock.fill").font(.caption).foregroundStyle(.secondary)
+            Label("level \(level)", systemImage: "lock.fill").font(.caption).foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 10)
@@ -94,17 +94,17 @@ struct AvatarCard: View {
         VStack(spacing: 14) {
             LernAvatarBild(avatar: avatar).frame(height: 220)
             Text(avatar.name).font(.largeTitle.bold())
-            Text("\(avatar.tierart) · \(avatar.lernrolle)")
+            Text("\(avatar.species) · \(avatar.role)")
                 .font(.headline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
 
             HStack(spacing: 12) {
-                Text("„\(avatar.spruch)“").font(.title3.italic())
+                Text("“\(avatar.spruch)”").font(.title3.italic())
                 Button { Speaker.shared.speak(avatar.spruch) } label: {
                     Image(systemName: "speaker.wave.2.circle.fill").font(.title)
                 }
-                .accessibilityLabel("Vorlesen")
+                .accessibilityLabel("Read aloud")
             }
             .padding()
             .frame(maxWidth: .infinity)
@@ -112,21 +112,63 @@ struct AvatarCard: View {
 
             Spacer()
             if progress.companion == avatar {
-                Label("Dein Lernbegleiter", systemImage: "checkmark.circle.fill")
+                Label("Your learning buddy", systemImage: "checkmark.circle.fill")
                     .font(.headline)
                     .foregroundStyle(.tint)
             } else if progress.unlockedHerd.contains(avatar) {
-                Button("\(avatar.name) als Lernbegleiter wählen") {
+                Button("Make \(avatar.name) your buddy") {
                     progress.chooseCompanion(avatar)
                     dismiss()
                 }
                 .buttonStyle(.bordered)
             }
-            Button("Schließen") { dismiss() }
+            Button("Close") { dismiss() }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
         }
         .padding(24)
         .background(Color("WoolCard"))
+    }
+}
+
+/// Schnell den Lernbegleiter wechseln, unter allen Tieren, die schon in der Herde sind.
+struct BuddySwitcherView: View {
+    @Environment(PlayerProgress.self) private var progress
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 16) {
+                    Text("Who do you want to learn with today?")
+                        .font(.headline)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 104), spacing: 12)], spacing: 12) {
+                        ForEach(progress.unlockedHerd) { avatar in
+                            Button {
+                                progress.chooseCompanion(avatar)
+                                Speaker.shared.speak(avatar.spruch)
+                                dismiss()
+                            } label: {
+                                AvatarTile(avatar: avatar, isCompanion: progress.companion == avatar)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    if progress.unlockedHerd.count < progress.herd.count {
+                        Text("Reach the next level to bring more friends into your herd.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
+                }
+                .padding()
+            }
+            .background(Color("Wool"))
+            .navigationTitle("Change buddy")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { Button("Done") { dismiss() } }
+        }
     }
 }

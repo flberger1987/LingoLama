@@ -17,21 +17,21 @@ public struct Accessory: Identifiable, Hashable, Sendable {
 /// Die IDs stehen in gespeicherten Spielständen und dürfen sich nie ändern.
 public enum Wardrobe {
     public static let catalog: [Accessory] = [
-        Accessory(id: "cap", name: "Kappe", emoji: "🧢", slot: .head, price: 20),
-        Accessory(id: "sunhat", name: "Sonnenhut", emoji: "👒", slot: .head, price: 40),
-        Accessory(id: "tophat", name: "Zylinder", emoji: "🎩", slot: .head, price: 60),
-        Accessory(id: "crown", name: "Krone", emoji: "👑", slot: .head, price: 150),
-        Accessory(id: "gradcap", name: "Doktorhut", emoji: "🎓", slot: .head, price: 90),
-        Accessory(id: "glasses", name: "Brille", emoji: "👓", slot: .eyes, price: 25),
-        Accessory(id: "sunglasses", name: "Sonnenbrille", emoji: "🕶️", slot: .eyes, price: 35),
-        Accessory(id: "bell", name: "Glöckchen", emoji: "🔔", slot: .neck, price: 15),
-        Accessory(id: "bow", name: "Schleife", emoji: "🎀", slot: .neck, price: 25),
-        Accessory(id: "scarf", name: "Schal", emoji: "🧣", slot: .neck, price: 40),
-        Accessory(id: "flower", name: "Blume", emoji: "🌸", slot: .extra, price: 10),
-        Accessory(id: "balloon", name: "Luftballon", emoji: "🎈", slot: .extra, price: 30),
-        Accessory(id: "yarn", name: "Wollknäuel", emoji: "🧶", slot: .extra, price: 50),
-        Accessory(id: "sunflower", name: "Sonnenblume", emoji: "🌻", slot: .extra, price: 20),
-        Accessory(id: "butterfly", name: "Schmetterling", emoji: "🦋", slot: .extra, price: 45),
+        Accessory(id: "cap", name: "Cap", emoji: "🧢", slot: .head, price: 20),
+        Accessory(id: "sunhat", name: "Sun hat", emoji: "👒", slot: .head, price: 40),
+        Accessory(id: "tophat", name: "Top hat", emoji: "🎩", slot: .head, price: 60),
+        Accessory(id: "crown", name: "Crown", emoji: "👑", slot: .head, price: 150),
+        Accessory(id: "gradcap", name: "Grad cap", emoji: "🎓", slot: .head, price: 90),
+        Accessory(id: "glasses", name: "Glasses", emoji: "👓", slot: .eyes, price: 25),
+        Accessory(id: "sunglasses", name: "Sunglasses", emoji: "🕶️", slot: .eyes, price: 35),
+        Accessory(id: "bell", name: "Bell", emoji: "🔔", slot: .neck, price: 15),
+        Accessory(id: "bow", name: "Bow", emoji: "🎀", slot: .neck, price: 25),
+        Accessory(id: "scarf", name: "Scarf", emoji: "🧣", slot: .neck, price: 40),
+        Accessory(id: "flower", name: "Flower", emoji: "🌸", slot: .extra, price: 10),
+        Accessory(id: "balloon", name: "Balloon", emoji: "🎈", slot: .extra, price: 30),
+        Accessory(id: "yarn", name: "Ball of yarn", emoji: "🧶", slot: .extra, price: 50),
+        Accessory(id: "sunflower", name: "Sunflower", emoji: "🌻", slot: .extra, price: 20),
+        Accessory(id: "butterfly", name: "Butterfly", emoji: "🦋", slot: .extra, price: 45),
     ]
 
     public static func accessory(id: String) -> Accessory? {
@@ -62,9 +62,9 @@ public struct Treat: Identifiable, Hashable, Sendable {
 public enum Treats {
     /// Was Alpakas und Lamas wirklich mögen.
     public static let catalog: [Treat] = [
-        Treat(id: "hay", name: "Heu", emoji: "🌾", price: 2),
-        Treat(id: "carrot", name: "Karotte", emoji: "🥕", price: 4),
-        Treat(id: "apple", name: "Apfel", emoji: "🍎", price: 6),
-        Treat(id: "melon", name: "Melone", emoji: "🍉", price: 10),
+        Treat(id: "hay", name: "Hay", emoji: "🌾", price: 2),
+        Treat(id: "carrot", name: "Carrot", emoji: "🥕", price: 4),
+        Treat(id: "apple", name: "Apple", emoji: "🍎", price: 6),
+        Treat(id: "melon", name: "Melon", emoji: "🍉", price: 10),
     ]
 }

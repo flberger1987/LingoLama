@@ -9,8 +9,8 @@ struct StarterPickerView: View {
         VStack(spacing: 0) {
             ScrollView {
                 VStack(spacing: 16) {
-                    Text("Wähle deinen Lernbegleiter!").font(.largeTitle.bold()).multilineTextAlignment(.center)
-                    Text("\(LernAvatar.allCases.count) Alpakas und Lamas warten auf dich. Eins darfst du dir jetzt aussuchen, die anderen kommen nach und nach in deine Herde.")
+                    Text("Choose your learning buddy!").font(.largeTitle.bold()).multilineTextAlignment(.center)
+                    Text("\(LernAvatar.allCases.count) alpacas and llamas are waiting for you. Pick one now – the others will join your herd step by step.")
                         .multilineTextAlignment(.center)
                         .foregroundStyle(.secondary)
 
@@ -20,7 +20,7 @@ struct StarterPickerView: View {
                                 VStack(spacing: 4) {
                                     LernAvatarBild(avatar: avatar).frame(height: 84)
                                     Text(avatar.name).font(.subheadline.bold()).lineLimit(1).minimumScaleFactor(0.7)
-                                    Text(avatar.tierart).font(.caption).foregroundStyle(.secondary)
+                                    Text(avatar.species).font(.caption).foregroundStyle(.secondary)
                                 }
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 10)
@@ -43,15 +43,15 @@ struct StarterPickerView: View {
                         LernAvatarBild(avatar: picked).frame(width: 64, height: 64)
                         VStack(alignment: .leading, spacing: 2) {
                             Text(picked.name).font(.title3.bold())
-                            Text(picked.lernrolle).font(.subheadline).foregroundStyle(.secondary)
+                            Text(picked.role).font(.subheadline).foregroundStyle(.secondary)
                             Button { Speaker.shared.speak(picked.spruch) } label: {
-                                Label("„\(picked.spruch)“", systemImage: "speaker.wave.2.fill").font(.subheadline.italic())
+                                Label("“\(picked.spruch)”", systemImage: "speaker.wave.2.fill").font(.subheadline.italic())
                             }
                         }
                         Spacer(minLength: 0)
                     }
                     Button { progress.chooseStarter(picked) } label: {
-                        Text("\(picked.name) wählen").font(.title3.bold()).frame(maxWidth: .infinity).padding(.vertical, 6)
+                        Text("Choose \(picked.name)").font(.title3.bold()).frame(maxWidth: .infinity).padding(.vertical, 6)
                     }
                     .buttonStyle(.borderedProminent)
                     .buttonBorderShape(.roundedRectangle(radius: 16))

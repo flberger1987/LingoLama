@@ -29,10 +29,10 @@ struct AddWordsView: View {
             Group {
                 if suggestions.isEmpty { inputStep } else { reviewStep }
             }
-            .navigationTitle("Neue Wörter")
+            .navigationTitle("New words")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Abbrechen") { dismiss() } }
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
             }
         }
     }
@@ -45,9 +45,9 @@ struct AddWordsView: View {
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
             } header: {
-                Text("Englische Wörter – eins pro Zeile")
+                Text("English words – one per line")
             } footer: {
-                Text("Keine Sorge wegen Tippfehlern, die KI hilft dir.")
+                Text("Don't worry about typos – the AI helps you.")
             }
 
             if let error {
@@ -60,14 +60,14 @@ struct AddWordsView: View {
                 } label: {
                     HStack {
                         Spacer()
-                        if loading { ProgressView() } else { Label("Prüfen & ergänzen", systemImage: "sparkles").font(.headline) }
+                        if loading { ProgressView() } else { Label("Check & complete", systemImage: "sparkles").font(.headline) }
                         Spacer()
                     }
                 }
                 .disabled(inputWords.isEmpty || loading)
 
                 if !ProxyClient.shared.isConfigured || error != nil {
-                    Button("Ohne KI hinzufügen (Deutsch selbst eintragen)") { addWithoutAI() }
+                    Button("Add without AI (type the German yourself)") { addWithoutAI() }
                         .disabled(inputWords.isEmpty)
                 }
             }
@@ -83,7 +83,7 @@ struct AddWordsView: View {
                     }
                 }
             } header: {
-                Text("Stimmt alles? Tipp an, was du übernehmen willst.")
+                Text("All correct? Tap the words you want to keep.")
             }
 
             Section {
@@ -92,14 +92,14 @@ struct AddWordsView: View {
                 } label: {
                     HStack {
                         Spacer()
-                        Text("\(ready.count) Wörter speichern").font(.headline)
+                        Text("Save \(ready.count) words").font(.headline)
                         Spacer()
                     }
                 }
                 .disabled(ready.isEmpty)
             } footer: {
                 if ready.count < selected.count {
-                    Text("Wörter ohne deutsche Bedeutung werden nicht gespeichert.")
+                    Text("Words without a German meaning are not saved.")
                 }
             }
         }
@@ -160,9 +160,9 @@ private struct SuggestionRow: View {
                     Button { Speaker.shared.speak(suggestion.english) } label: { Image(systemName: "speaker.wave.2.fill") }
                         .buttonStyle(.borderless)
                 }
-                TextField("Deutsch", text: $suggestion.german)
+                TextField("German", text: $suggestion.german)
                 if suggestion.corrected {
-                    Text("Du hattest: \(suggestion.input)").font(.caption).strikethrough().foregroundStyle(.secondary)
+                    Text("You typed: \(suggestion.input)").font(.caption).strikethrough().foregroundStyle(.secondary)
                 }
                 if !suggestion.note.isEmpty {
                     Label(suggestion.note, systemImage: "lightbulb.fill").font(.caption).foregroundStyle(.orange)

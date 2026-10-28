@@ -13,6 +13,7 @@ struct HomeView: View {
     @State private var newLessonName = ""
     @State private var showWardrobe = false
     @State private var showHerd = false
+    @State private var showBuddies = false
 
     private var dueCount: Int {
         words.reduce(0) { count, word in
@@ -24,7 +25,7 @@ struct HomeView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 20) {
-                    CompanionCard { showWardrobe = true }
+                    CompanionCard(openWardrobe: { showWardrobe = true }, changeBuddy: { showBuddies = true })
                     ProgressHeader()
                     HerdRow { showHerd = true }
 
@@ -38,9 +39,9 @@ struct HomeView: View {
 
                     VStack(alignment: .leading, spacing: 12) {
                         HStack {
-                            Text("Lektionen").font(.title2.bold())
+                            Text("Lessons").font(.title2.bold())
                             Spacer()
-                            Button("Neu", systemImage: "plus.circle.fill") { showNewLesson = true }
+                            Button("New", systemImage: "plus.circle.fill") { showNewLesson = true }
                                 .font(.headline)
                         }
                         ForEach(lessons) { lesson in
@@ -55,16 +56,17 @@ struct HomeView: View {
             .navigationTitle("LingoLama")
             .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(for: Lesson.self) { LessonView(lesson: $0) }
-            .alert("Neue Lektion", isPresented: $showNewLesson) {
-                TextField("z. B. Unit 3", text: $newLessonName)
-                Button("Anlegen") { addLesson() }
-                Button("Abbrechen", role: .cancel) { newLessonName = "" }
+            .alert("New lesson", isPresented: $showNewLesson) {
+                TextField("e.g. Unit 3", text: $newLessonName)
+                Button("Create") { addLesson() }
+                Button("Cancel", role: .cancel) { newLessonName = "" }
             }
             .fullScreenCover(item: $quiz) { request in
                 QuizView(words: request.words, mode: request.mode)
             }
             .sheet(isPresented: $showWardrobe) { WardrobeView() }
             .sheet(isPresented: $showHerd) { HerdView() }
+            .sheet(isPresented: $showBuddies) { BuddySwitcherView() }
             .fullScreenCover(isPresented: Binding(get: { progress.starter == nil }, set: { _ in })) {
                 StarterPickerView()
             }
@@ -88,22 +90,29 @@ struct QuizRequest: Identifiable {
 private struct CompanionCard: View {
     @Environment(PlayerProgress.self) private var progress
     let openWardrobe: () -> Void
+    let changeBuddy: () -> Void
 
     var body: some View {
         HStack(spacing: 16) {
             Button(action: openWardrobe) { CompanionView(size: 100) }
                 .buttonStyle(.plain)
             VStack(alignment: .leading, spacing: 6) {
-                Text("Hallo Valerie!").font(.title2.bold())
+                Text("Hello Valerie!").font(.title2.bold())
                 if let companion = progress.companion {
-                    Text("„\(companion.spruch)\u{2060}“")
+                    Text("“\(companion.spruch)\u{2060}”")
                         .font(.subheadline.italic())
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
-                Button("Kleiderschrank", systemImage: "tshirt.fill", action: openWardrobe)
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.small)
+                HStack(spacing: 8) {
+                    Button("Rewards", systemImage: "gift.fill", action: openWardrobe)
+                        .buttonStyle(.borderedProminent)
+                    Button("Change buddy", systemImage: "arrow.triangle.2.circlepath", action: changeBuddy)
+                        .buttonStyle(.bordered)
+                        .labelStyle(.iconOnly)
+                        .accessibilityLabel("Change buddy")
+                }
+                .controlSize(.small)
             }
             Spacer(minLength: 0)
         }
@@ -121,7 +130,7 @@ private struct HerdRow: View {
         Button(action: open) {
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Deine Herde").font(.headline)
+                    Text("Your herd").font(.headline)
                     HStack(spacing: -10) {
                         ForEach(herd.suffix(6).reversed()) { avatar in
                             LernAvatarBild(avatar: avatar)
@@ -132,7 +141,7 @@ private struct HerdRow: View {
                         }
                     }
                     if herd.count == 1 {
-                        Text("Bei Level 2 kommen die ersten Freunde dazu").font(.caption).foregroundStyle(.secondary)
+                        Text("New friends join you at level 2").font(.caption).foregroundStyle(.secondary)
                     }
                 }
                 Spacer()
@@ -153,12 +162,12 @@ private struct ProgressHeader: View {
         VStack(spacing: 14) {
             HStack(spacing: 12) {
                 Stat(value: "\(progress.level)", label: "Level", symbol: "crown.fill", color: .accentColor)
-                Stat(value: "\(progress.availableStars)", label: "Sterne", symbol: "star.fill", color: .yellow)
-                Stat(value: "\(progress.streak)", label: progress.streak == 1 ? "Tag" : "Tage", symbol: "flame.fill",
+                Stat(value: "\(progress.availableStars)", label: "Stars", symbol: "star.fill", color: .yellow)
+                Stat(value: "\(progress.streak)", label: progress.streak == 1 ? "day" : "days", symbol: "flame.fill",
                      color: progress.practicedToday ? .orange : .gray)
             }
             ProgressView(value: progress.levelProgress) {
-                Text("\(progress.levelTitle) · bis Level \(progress.level + 1)").font(.caption).foregroundStyle(.secondary)
+                Text("\(progress.levelTitle) · next: level \(progress.level + 1)").font(.caption).foregroundStyle(.secondary)
             }
         }
         .padding()
@@ -190,15 +199,15 @@ private struct PracticeButton: View {
 
     var body: some View {
         VStack(spacing: 12) {
-            Picker("Richtung", selection: $mode) {
+            Picker("Direction", selection: $mode) {
                 ForEach(QuizMode.allCases) { Text($0.label).tag($0) }
             }
             .pickerStyle(.segmented)
 
             Button { start(mode) } label: {
                 VStack(spacing: 4) {
-                    Text("Jetzt üben!").font(.title2.bold())
-                    Text(dueCount > 0 ? "\(dueCount) Karten warten auf dich" : "Alles geschafft – extra Runde?")
+                    Text("Let's practise!").font(.title2.bold())
+                    Text(dueCount > 0 ? "\(dueCount) cards are waiting for you" : "All done – one more round?")
                         .font(.subheadline)
                 }
                 .frame(maxWidth: .infinity)
@@ -217,7 +226,7 @@ private struct LessonRow: View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text(lesson.name).font(.headline)
-                Text("\(lesson.words.count) Wörter").font(.subheadline).foregroundStyle(.secondary)
+                Text("\(lesson.words.count) words").font(.subheadline).foregroundStyle(.secondary)
             }
             Spacer()
             MasteryRing(value: lesson.words.isEmpty ? 0 : lesson.words.map(\.mastery).reduce(0, +) / Double(lesson.words.count))
@@ -240,7 +249,7 @@ struct MasteryRing: View {
                 .rotationEffect(.degrees(-90))
         }
         .frame(width: 32, height: 32)
-        .accessibilityLabel("\(Int(fraction * 100)) Prozent gelernt")
+        .accessibilityLabel("\(Int(fraction * 100)) percent learned")
     }
 }
 
@@ -249,8 +258,8 @@ private struct EmptyHint: View {
 
     var body: some View {
         VStack(spacing: 8) {
-            Text("So geht's los").font(.title3.bold())
-            Text("Ich bin \(progress.companion?.name ?? "dein Lama"), dein Lernbegleiter. Leg eine Lektion an und tipp deine neuen Vokabeln ein. Mit jedem richtigen Wort verdienst du Sterne für meinen Kleiderschrank!")
+            Text("Let's get started").font(.title3.bold())
+            Text("I'm \(progress.companion?.name ?? "your llama"), your learning buddy. Add a lesson and type in your new words. Every right answer earns stars for rewards!")
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
         }

@@ -129,7 +129,7 @@ final class PlayerProgress {
 
     /// Lama-Rang pro Level, ab dem letzten bleibt er gleich.
     private static let levelTitles = [
-        "Lama-Baby", "Kleines Lama", "Wolliges Lama", "Flinkes Lama", "Kletter-Lama",
-        "Berg-Lama", "Anden-Lama", "Lama-Profi", "Lama-Champion", "Lama-Legende",
+        "Baby Llama", "Little Llama", "Woolly Llama", "Speedy Llama", "Climbing Llama",
+        "Mountain Llama", "Andes Llama", "Llama Pro", "Llama Champion", "Llama Legend",
     ]
 }

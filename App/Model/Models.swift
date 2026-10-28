@@ -69,8 +69,8 @@ enum Direction: String, CaseIterable, Codable, Identifiable {
 
     var label: String {
         switch self {
-        case .deToEn: "Deutsch → Englisch"
-        case .enToDe: "Englisch → Deutsch"
+        case .deToEn: "German → English"
+        case .enToDe: "English → German"
         }
     }
 }
@@ -83,7 +83,7 @@ enum QuizMode: String, CaseIterable, Identifiable {
         switch self {
         case .deToEn: "🇩🇪 → 🇬🇧"
         case .enToDe: "🇬🇧 → 🇩🇪"
-        case .mixed: "Gemischt"
+        case .mixed: "Mixed"
         }
     }
 
