@@ -7,4 +7,4 @@ DerivedData/
 .swiftpm/
 
 # Original-Avatare in voller Größe; die App nutzt verkleinerte Kopien in App/Resources
-Avatare/
+/Avatare/
