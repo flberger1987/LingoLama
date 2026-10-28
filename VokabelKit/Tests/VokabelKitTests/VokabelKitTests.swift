@@ -89,6 +89,17 @@ struct WardrobeTests {
         #expect(Wardrobe.purchaseProblem(for: cap, owned: [], availableStars: 5) == .notEnoughStars(missing: 15))
         #expect(Wardrobe.purchaseProblem(for: cap, owned: ["cap"], availableStars: 100) == .alreadyOwned)
     }
+
+    /// Gekaufte Teile stehen mit ihrer ID im Spielstand; fehlt eine, wäre sie nach einem Update weg.
+    @Test func shippedIDsStayAvailable() {
+        let shipped = ["cap", "sunhat", "tophat", "crown", "glasses", "sunglasses", "bell", "bow", "scarf", "flower", "balloon", "yarn"]
+        for id in shipped { #expect(Wardrobe.accessory(id: id) != nil, "\(id) fehlt") }
+    }
+
+    @Test func treats() {
+        #expect(Set(Treats.catalog.map(\.id)).count == Treats.catalog.count)
+        #expect(Treats.catalog.allSatisfy { $0.price > 0 })
+    }
 }
 
 struct HerdTests {

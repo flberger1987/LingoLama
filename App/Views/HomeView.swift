@@ -246,9 +246,6 @@ struct MasteryRing: View {
 
 private struct EmptyHint: View {
     @Environment(PlayerProgress.self) private var progress
-    #if DEBUG
-    @Environment(\.modelContext) private var context
-    #endif
 
     var body: some View {
         VStack(spacing: 8) {
@@ -256,13 +253,6 @@ private struct EmptyHint: View {
             Text("Ich bin \(progress.companion?.name ?? "dein Lama"), dein Lernbegleiter. Leg eine Lektion an und tipp deine neuen Vokabeln ein. Mit jedem richtigen Wort verdienst du Sterne für meinen Kleiderschrank!")
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
-            #if DEBUG
-            Button("Demodaten laden", systemImage: "wand.and.stars") {
-                withAnimation { DemoData.load(into: context, progress: progress) }
-            }
-            .buttonStyle(.bordered)
-            .padding(.top, 4)
-            #endif
         }
         .padding()
         .frame(maxWidth: .infinity)

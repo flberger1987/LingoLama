@@ -1,6 +1,6 @@
 import Foundation
 
-/// Wo Lingo ein Accessoire trägt. Pro Platz ist immer nur eins angezogen.
+/// Wo der Lernbegleiter ein Accessoire trägt. Pro Platz ist immer nur eins angezogen.
 public enum Slot: String, CaseIterable, Sendable {
     case head, eyes, neck, extra
 }
@@ -13,13 +13,15 @@ public struct Accessory: Identifiable, Hashable, Sendable {
     public let price: Int
 }
 
-/// Lingos Kleiderschrank: was es zu kaufen gibt und wann ein Kauf klappt.
+/// Der Kleiderschrank: was es zu kaufen gibt und wann ein Kauf klappt.
+/// Die IDs stehen in gespeicherten Spielständen und dürfen sich nie ändern.
 public enum Wardrobe {
     public static let catalog: [Accessory] = [
         Accessory(id: "cap", name: "Kappe", emoji: "🧢", slot: .head, price: 20),
         Accessory(id: "sunhat", name: "Sonnenhut", emoji: "👒", slot: .head, price: 40),
         Accessory(id: "tophat", name: "Zylinder", emoji: "🎩", slot: .head, price: 60),
         Accessory(id: "crown", name: "Krone", emoji: "👑", slot: .head, price: 150),
+        Accessory(id: "gradcap", name: "Doktorhut", emoji: "🎓", slot: .head, price: 90),
         Accessory(id: "glasses", name: "Brille", emoji: "👓", slot: .eyes, price: 25),
         Accessory(id: "sunglasses", name: "Sonnenbrille", emoji: "🕶️", slot: .eyes, price: 35),
         Accessory(id: "bell", name: "Glöckchen", emoji: "🔔", slot: .neck, price: 15),
@@ -28,6 +30,8 @@ public enum Wardrobe {
         Accessory(id: "flower", name: "Blume", emoji: "🌸", slot: .extra, price: 10),
         Accessory(id: "balloon", name: "Luftballon", emoji: "🎈", slot: .extra, price: 30),
         Accessory(id: "yarn", name: "Wollknäuel", emoji: "🧶", slot: .extra, price: 50),
+        Accessory(id: "sunflower", name: "Sonnenblume", emoji: "🌻", slot: .extra, price: 20),
+        Accessory(id: "butterfly", name: "Schmetterling", emoji: "🦋", slot: .extra, price: 45),
     ]
 
     public static func accessory(id: String) -> Accessory? {
@@ -45,4 +49,22 @@ public enum Wardrobe {
         if availableStars < item.price { return .notEnoughStars(missing: item.price - availableStars) }
         return nil
     }
+}
+
+/// Ein Leckerli wird nicht behalten, sondern sofort verfüttert.
+public struct Treat: Identifiable, Hashable, Sendable {
+    public let id: String
+    public let name: String
+    public let emoji: String
+    public let price: Int
+}
+
+public enum Treats {
+    /// Was Alpakas und Lamas wirklich mögen.
+    public static let catalog: [Treat] = [
+        Treat(id: "hay", name: "Heu", emoji: "🌾", price: 2),
+        Treat(id: "carrot", name: "Karotte", emoji: "🥕", price: 4),
+        Treat(id: "apple", name: "Apfel", emoji: "🍎", price: 6),
+        Treat(id: "melon", name: "Melone", emoji: "🍉", price: 10),
+    ]
 }

@@ -18,6 +18,7 @@ final class PlayerProgress {
     /// Beim ersten Start ausgesucht; legt die Reihenfolge der Herde fest.
     private(set) var starter: LernAvatar? { didSet { defaults.set(starter?.rawValue, forKey: "starterAvatar") } }
     private var chosenCompanion: LernAvatar? { didSet { defaults.set(chosenCompanion?.rawValue, forKey: "companionAvatar") } }
+    private(set) var treatsFed: Int { didSet { defaults.set(treatsFed, forKey: "treatsFed") } }
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
@@ -29,6 +30,7 @@ final class PlayerProgress {
         outfit = defaults.dictionary(forKey: "outfit") as? [String: String] ?? [:]
         starter = defaults.string(forKey: "starterAvatar").flatMap(LernAvatar.init(rawValue:))
         chosenCompanion = defaults.string(forKey: "companionAvatar").flatMap(LernAvatar.init(rawValue:))
+        treatsFed = defaults.integer(forKey: "treatsFed")
     }
 
     var level: Int { Rewards.level(forStars: stars) }
@@ -110,21 +112,20 @@ final class PlayerProgress {
         outfit[item.slot.rawValue] = item.id
     }
 
+    /// Verfüttert ein Leckerli. Gibt zurück, ob die Sterne gereicht haben.
+    @discardableResult
+    func feed(_ treat: Treat) -> Bool {
+        guard availableStars >= treat.price else { return false }
+        spentStars += treat.price
+        treatsFed += 1
+        return true
+    }
+
     /// Zieht ein gekauftes Teil an oder wieder aus.
     func toggle(_ item: Accessory) {
         guard owned.contains(item.id) else { return }
         outfit[item.slot.rawValue] = isWearing(item) ? nil : item.id
     }
-
-    #if DEBUG
-    /// Für die Demodaten: Sterne setzen, Kleiderschrank leeren.
-    func setDemoStars(_ value: Int) {
-        stars = value
-        spentStars = 0
-        owned = []
-        outfit = [:]
-    }
-    #endif
 
     /// Lama-Rang pro Level, ab dem letzten bleibt er gleich.
     private static let levelTitles = [
