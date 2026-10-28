@@ -24,7 +24,6 @@ struct CompanionView: View {
                     let place = item.placement(on: avatar)
                     Text(item.emoji)
                         .font(.system(size: size * place.scale))
-                        .scaleEffect(x: place.stretch, y: 1)
                         .rotationEffect(.degrees(place.rotation))
                         .offset(x: size * place.x, y: size * place.y)
                 }
@@ -56,61 +55,110 @@ extension Slot {
     }
 }
 
-/// Wo ein Teil sitzt: Mitte relativ zur Bildmitte und Größe, jeweils in Vielfachen der Bildgröße.
-/// Dazu Drehung im Uhrzeigersinn und Stauchung in der Breite, damit es zu geneigten Köpfen passt.
+/// Wo ein Teil sitzt: Mitte relativ zur Bildmitte, Größe und Drehung im Uhrzeigersinn, in Vielfachen der Bildgröße.
 struct Placement {
     let x: CGFloat
     let y: CGFloat
     let scale: CGFloat
     var rotation: Double = 0
-    var stretch: CGFloat = 1
+}
 
-    /// Die Hoftiere sind gleich aufgebaut: Ohren oben, Augen knapp über der Mitte, Hals unten.
-    fileprivate static let standard: [String: Placement] = [
-        "cap": .init(x: 0.03, y: -0.29, scale: 0.36),
-        "sunhat": .init(x: 0.02, y: -0.33, scale: 0.40),
-        "tophat": .init(x: 0.02, y: -0.35, scale: 0.34),
-        "crown": .init(x: 0.02, y: -0.31, scale: 0.30),
-        "gradcap": .init(x: 0.02, y: -0.31, scale: 0.34),
-        "glasses": .init(x: 0.03, y: -0.03, scale: 0.30),
-        "sunglasses": .init(x: 0.03, y: -0.03, scale: 0.30),
-        "bell": .init(x: 0, y: 0.27, scale: 0.18),
-        "bow": .init(x: 0, y: 0.26, scale: 0.24),
-        "scarf": .init(x: 0, y: 0.34, scale: 0.32),
-        "flower": .init(x: 0.27, y: -0.24, scale: 0.20),
-        "sunflower": .init(x: -0.27, y: -0.24, scale: 0.20),
-        "balloon": .init(x: 0.36, y: -0.30, scale: 0.26),
-        "yarn": .init(x: 0.34, y: 0.38, scale: 0.22),
-        "butterfly": .init(x: 0.34, y: -0.36, scale: 0.18),
+/// Die Augen eines Avatars, in Bildkoordinaten (Mitte 0, Rand ±0.5, y nach unten), aus den Bildern vermessen.
+/// Daraus ergeben sich Kopfneigung und Gesichtsgröße, nach denen alle Teile ausgerichtet werden.
+struct AvatarFace {
+    let left: CGPoint
+    let right: CGPoint
+
+    var center: CGPoint { CGPoint(x: (left.x + right.x) / 2, y: (left.y + right.y) / 2) }
+    var eyeDistance: CGFloat { hypot(right.x - left.x, right.y - left.y) }
+    var tilt: Double { atan2(right.y - left.y, right.x - left.x) * 180 / .pi }
+
+    /// Punkt im Gesicht: `along` entlang der Augenachse, `up` Richtung Stirn, beides in Augenabständen.
+    func point(along: CGFloat, up: CGFloat) -> CGPoint {
+        let d = eyeDistance
+        let ax = (right.x - left.x) / d, ay = (right.y - left.y) / d
+        return CGPoint(x: center.x + (along * ax + up * ay) * d, y: center.y + (along * ay - up * ax) * d)
+    }
+
+    static let all: [LernAvatar: AvatarFace] = [
+        .amber: .init(left: CGPoint(x: -0.07, y: -0.093), right: CGPoint(x: 0.147, y: -0.048)),
+        .callisto: .init(left: CGPoint(x: -0.046, y: -0.06), right: CGPoint(x: 0.172, y: -0.019)),
+        .carry: .init(left: CGPoint(x: -0.072, y: -0.073), right: CGPoint(x: 0.163, y: -0.04)),
+        .catwizzle: .init(left: CGPoint(x: -0.066, y: -0.073), right: CGPoint(x: 0.151, y: -0.046)),
+        .claire: .init(left: CGPoint(x: -0.076, y: -0.065), right: CGPoint(x: 0.15, y: -0.029)),
+        .cloe: .init(left: CGPoint(x: -0.066, y: -0.076), right: CGPoint(x: 0.165, y: -0.039)),
+        .covergirl: .init(left: CGPoint(x: -0.072, y: -0.073), right: CGPoint(x: 0.163, y: -0.035)),
+        .dexter: .init(left: CGPoint(x: -0.082, y: -0.09), right: CGPoint(x: 0.146, y: -0.04)),
+        .diandro: .init(left: CGPoint(x: -0.06, y: -0.05), right: CGPoint(x: 0.171, y: -0.006)),
+        .diego: .init(left: CGPoint(x: -0.08, y: -0.067), right: CGPoint(x: 0.146, y: -0.026)),
+        .flavio: .init(left: CGPoint(x: -0.07, y: -0.051), right: CGPoint(x: 0.154, y: -0.009)),
+        .jeppediah: .init(left: CGPoint(x: -0.061, y: -0.09), right: CGPoint(x: 0.151, y: -0.056)),
+        .kuno: .init(left: CGPoint(x: -0.076, y: -0.081), right: CGPoint(x: 0.155, y: -0.039)),
+        .leyla: .init(left: CGPoint(x: -0.08, y: -0.076), right: CGPoint(x: 0.148, y: -0.031)),
+        .mrRight: .init(left: CGPoint(x: -0.117, y: -0.113), right: CGPoint(x: 0.134, y: -0.082)),
+        .nalima: .init(left: CGPoint(x: -0.061, y: -0.077), right: CGPoint(x: 0.169, y: -0.032)),
+        .nougat: .init(left: CGPoint(x: -0.072, y: -0.06), right: CGPoint(x: 0.126, y: -0.029)),
+        .rocky: .init(left: CGPoint(x: -0.082, y: -0.06), right: CGPoint(x: 0.146, y: -0.021)),
+        .santana: .init(left: CGPoint(x: -0.06, y: -0.04), right: CGPoint(x: 0.16, y: -0.009)),
+        .silk: .init(left: CGPoint(x: -0.08, y: -0.066), right: CGPoint(x: 0.146, y: -0.032)),
+        .thaios: .init(left: CGPoint(x: -0.05, y: -0.098), right: CGPoint(x: 0.148, y: -0.063)),
+        .whitney: .init(left: CGPoint(x: -0.07, y: -0.068), right: CGPoint(x: 0.168, y: -0.028)),
     ]
 
-    /// Mr. Right ist nach eigenem Foto gezeichnet: Kopf um etwa 8° im Uhrzeigersinn geneigt und leicht gedreht,
-    /// Augen höher, langer schmaler Hals mit Halfter. Hüte und Brillen kippen deshalb mit.
-    fileprivate static let mrRight: [String: Placement] = [
-        "cap": .init(x: 0.03, y: -0.30, scale: 0.36, rotation: 8),
-        "sunhat": .init(x: 0.03, y: -0.33, scale: 0.40, rotation: 8),
-        "tophat": .init(x: 0.03, y: -0.36, scale: 0.32, rotation: 8),
-        "crown": .init(x: 0.03, y: -0.32, scale: 0.28, rotation: 8),
-        "gradcap": .init(x: 0.03, y: -0.32, scale: 0.32, rotation: 8),
-        "glasses": .init(x: 0.01, y: -0.10, scale: 0.28, rotation: 8, stretch: 0.95),
-        "sunglasses": .init(x: 0.01, y: -0.10, scale: 0.28, rotation: 8, stretch: 0.95),
-        "bell": .init(x: 0.10, y: 0.20, scale: 0.14),
-        "bow": .init(x: 0.02, y: 0.24, scale: 0.18, rotation: 8),
-        "scarf": .init(x: 0.02, y: 0.30, scale: 0.25, stretch: 0.9),
-        "flower": .init(x: 0.24, y: -0.30, scale: 0.17, rotation: 20),
-        "sunflower": .init(x: -0.17, y: -0.33, scale: 0.17, rotation: -15),
+    /// Für den Fall ohne Begleiter: ein gerade nach vorn schauendes Gesicht.
+    static let neutral = AvatarFace(left: CGPoint(x: -0.1, y: -0.06), right: CGPoint(x: 0.12, y: -0.06))
+
+    static func of(_ avatar: LernAvatar?) -> AvatarFace { avatar.flatMap { all[$0] } ?? neutral }
+}
+
+/// Wo ein Teil im Gesicht sitzt, in Augenabständen; die Drehung kommt zur Kopfneigung dazu.
+struct FaceAnchor {
+    let along: CGFloat
+    let up: CGFloat
+    let size: CGFloat
+    var rotation: Double = 0
+
+    /// Gegen alle 22 Avatare geprüft.
+    static let items: [String: FaceAnchor] = [
+        "cap": .init(along: 0.1, up: 1.0, size: 1.45),
+        "sunhat": .init(along: 0, up: 1.05, size: 1.65),
+        "tophat": .init(along: 0, up: 1.05, size: 1.3),
+        "crown": .init(along: 0, up: 0.98, size: 1.15),
+        "gradcap": .init(along: 0, up: 0.98, size: 1.35),
+        "glasses": .init(along: 0, up: 0, size: 1.25),
+        "sunglasses": .init(along: 0, up: 0, size: 1.25),
+        "bell": .init(along: 0, up: -1.25, size: 0.6),
+        "bow": .init(along: 0, up: -1.2, size: 0.85),
+        "scarf": .init(along: 0, up: -1.55, size: 1.2),
+        "flower": .init(along: 1.05, up: 0.95, size: 0.8, rotation: 20),
+        "sunflower": .init(along: -1.05, up: 0.95, size: 0.8, rotation: -15),
+        "balloon": .init(along: 1.5, up: 1.2, size: 1.1),
+        "yarn": .init(along: 1.4, up: -2.0, size: 0.95),
+        "butterfly": .init(along: 1.4, up: 1.5, size: 0.8),
     ]
 
+    func placement(on face: AvatarFace) -> Placement {
+        let p = face.point(along: along, up: up)
+        let scale = size * face.eyeDistance
+        // Nicht über den Bildrand hinaus, damit Ballon und Co. nicht abgeschnitten werden.
+        let half = scale / 2
+        return Placement(x: min(max(p.x, -0.5 + half), 0.5 - half),
+                         y: min(max(p.y, -0.5 + half), 0.5 - half),
+                         scale: scale, rotation: face.tilt + rotation)
+    }
+}
+
+extension Placement {
     static func mouth(of avatar: LernAvatar?) -> Placement {
-        avatar == .mrRight ? .init(x: 0, y: 0.06, scale: 0) : .init(x: 0, y: 0.12, scale: 0)
+        let face = AvatarFace.of(avatar)
+        let p = face.point(along: 0.25, up: -0.75)
+        return Placement(x: p.x, y: p.y, scale: 0)
     }
 }
 
 extension Accessory {
     func placement(on avatar: LernAvatar?) -> Placement {
-        (avatar == .mrRight ? Placement.mrRight[id] : nil)
-            ?? Placement.standard[id]
-            ?? Placement(x: 0, y: 0, scale: 0.25)
+        (FaceAnchor.items[id] ?? FaceAnchor(along: 0, up: 0, size: 1)).placement(on: .of(avatar))
     }
 }
 
