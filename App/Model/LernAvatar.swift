@@ -1,10 +1,10 @@
 import SwiftUI
 
-/// Alle 21 benannten Tiere aus den 20 Einträgen der Schöcklblick-Galerie.
+/// 21 benannte Tiere der Schöcklblick-Galerie plus Mr. Right nach Nutzerfoto.
 /// Arten visuell eingeordnet; Lernrollen und Sprüche für Valerie erfunden.
-/// Jeppediah/Leyla: Zuordnung im gemeinsamen Foto ist eine Gestaltungsannahme.
+/// Jeppediah/Leyla: Namenszuordnung im gemeinsamen Foto ist eine Annahme.
 enum LernAvatar: String, CaseIterable, Identifiable {
-    case rocky, nougat, jeppediah, leyla, whitney, silk, santana, kuno, flavio, claire, catwizzle, diego, dexter, covergirl, carry, thaios, nalima, diandro, cloe, callisto, amber
+    case rocky, nougat, jeppediah, leyla, whitney, silk, santana, kuno, flavio, claire, catwizzle, diego, dexter, covergirl, carry, thaios, nalima, diandro, cloe, callisto, amber, mrRight
 
     var id: String { rawValue }
     var assetName: String { "avatar_\(rawValue)" }
@@ -32,6 +32,7 @@ enum LernAvatar: String, CaseIterable, Identifiable {
         case .cloe: "Cloe"
         case .callisto: "Callisto"
         case .amber: "Amber"
+        case .mrRight: "Mr. Right"
         }
     }
 
@@ -58,6 +59,7 @@ enum LernAvatar: String, CaseIterable, Identifiable {
         case .cloe: "Alpaka"
         case .callisto: "Alpaka"
         case .amber: "Alpaka"
+        case .mrRight: "Alpaka"
         }
     }
 
@@ -84,6 +86,7 @@ enum LernAvatar: String, CaseIterable, Identifiable {
         case .cloe: "Die liebevolle Mutmacherin"
         case .callisto: "Der neugierige Wortsammler"
         case .amber: "Die ruhige Geschichtenfreundin"
+        case .mrRight: "Der verlässliche Lernbegleiter"
         }
     }
 
@@ -110,6 +113,7 @@ enum LernAvatar: String, CaseIterable, Identifiable {
         case .cloe: "Mistakes help us learn!"
         case .callisto: "One new word at a time!"
         case .amber: "Every word tells a story."
+        case .mrRight: "Let's get it right together!"
         }
     }
 

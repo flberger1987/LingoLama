@@ -10,7 +10,7 @@ struct StarterPickerView: View {
             ScrollView {
                 VStack(spacing: 16) {
                     Text("Wähle deinen Lernbegleiter!").font(.largeTitle.bold()).multilineTextAlignment(.center)
-                    Text("Alle \(LernAvatar.allCases.count) Tiere wohnen auf dem Schöcklblick-Hof. Eins darfst du dir jetzt aussuchen, die anderen kommen nach und nach in deine Herde.")
+                    Text("\(LernAvatar.allCases.count) Alpakas und Lamas warten auf dich. Eins darfst du dir jetzt aussuchen, die anderen kommen nach und nach in deine Herde.")
                         .multilineTextAlignment(.center)
                         .foregroundStyle(.secondary)
 

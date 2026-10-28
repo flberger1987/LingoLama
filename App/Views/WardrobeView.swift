@@ -20,7 +20,7 @@ struct CompanionView: View {
                 if let item = progress.wearing(slot) {
                     Text(item.emoji)
                         .font(.system(size: size * slot.scale))
-                        .offset(x: size * slot.offset.x, y: size * slot.offset.y)
+                        .offset(x: size * slot.offset(on: progress.companion).x, y: size * slot.offset(on: progress.companion).y)
                 }
             }
         }
@@ -46,6 +46,12 @@ extension Slot {
         case .neck: CGPoint(x: 0, y: 0.34)
         case .extra: CGPoint(x: 0.3, y: -0.22)
         }
+    }
+
+    /// Mr. Right ist nach einem eigenen Foto gezeichnet: langer Hals, Augen deutlich höher als bei den Hoftieren.
+    fileprivate func offset(on avatar: LernAvatar?) -> CGPoint {
+        guard avatar == .mrRight, self == .eyes else { return offset }
+        return CGPoint(x: 0.03, y: -0.09)
     }
 
     fileprivate var scale: CGFloat {
